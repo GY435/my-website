@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>关于我 · 我的小屋</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      background:
+        repeating-linear-gradient(94deg,
+          transparent, transparent 18px,
+          rgba(139,105,50,.04) 18px, rgba(139,105,50,.04) 19px),
+        linear-gradient(155deg, #FAF0E0 0%, #EDDFBF 45%, #DCC9A4 100%);
+    }
+
+    .card {
+      text-align: center;
+      padding: 56px 72px;
+      background: rgba(255,251,242,.9);
+      border-radius: 22px;
+      box-shadow:
+        0 2px 0 rgba(255,255,255,.8) inset,
+        0 10px 48px rgba(100,70,30,.18),
+        0 1px 4px rgba(100,70,30,.12);
+      border: 1px solid rgba(200,165,110,.38);
+      max-width: 460px; width: calc(100% - 40px);
+      animation: cardIn .6s cubic-bezier(.34,1.56,.64,1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(22px) scale(.96); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .icon {
+      font-size: 62px; margin-bottom: 18px; display: block;
+      animation: iconBounce .5s ease .2s both;
+    }
+
+    @keyframes iconBounce {
+      from { opacity: 0; transform: scale(.5) rotate(-15deg); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    h1 {
+      color: #3E2208; font-size: 26px;
+      font-weight: 600; letter-spacing: 2px; margin-bottom: 6px;
+    }
+
+    .divider {
+      width: 48px; height: 2px; margin: 14px auto 16px;
+      background: linear-gradient(90deg, transparent, #C8944A, transparent);
+    }
+
+    .msg {
+      color: #7A5520; font-size: 15px; line-height: 1.9; margin-bottom: 8px;
+    }
+
+    .sub {
+      color: rgba(122,85,32,.55); font-size: 13px; margin-bottom: 36px;
+    }
+
+    .back {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: linear-gradient(135deg, #9E5C2C, #C8844A);
+      color: #fff; text-decoration: none;
+      padding: 11px 28px; border-radius: 28px;
+      font-size: 14px; letter-spacing: .5px;
+      box-shadow: 0 3px 14px rgba(158,92,44,.32);
+      transition: all .28s ease;
+    }
+
+    .back:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(158,92,44,.42);
+      background: linear-gradient(135deg, #884E25, #B5743B);
+    }
+
+    .back:active { transform: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="icon">🌟</span>
+    <h1>关于我</h1>
+    <div class="divider"></div>
+    <p class="msg">这间小屋的主人在整理故事<br>内容即将上线</p>
+    <p class="sub">感谢您的耐心等待 ✨</p>
+    <a class="back" href="index.html">
+      <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 12L6 8l4-4"/>
+      </svg>
+      返回小屋
+    </a>
+  </div>
+</body>
+</html>
