@@ -6,34 +6,78 @@
   <title>我的小屋</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #1A1A2E; overflow: hidden; font-family: 'Microsoft YaHei','PingFang SC',sans-serif; }
+    body { overflow: hidden; font-family: 'Microsoft YaHei','PingFang SC',sans-serif; }
 
-    #loading { position:fixed;inset:0;background:#1A1A2E;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;transition:opacity .8s ease; }
-    .ld-icon  { font-size:52px;margin-bottom:20px;animation:float 2s ease-in-out infinite; }
+    /* ── 背景图 ── */
+    #bg {
+      position: fixed; inset: 0; z-index: 0;
+      background: url('bg.jpg') center center / cover no-repeat;
+    }
+    /* 背景轻微模糊，让小屋更突出 */
+    #bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      backdrop-filter: blur(1.5px);
+      background: rgba(20, 40, 10, 0.08);
+    }
+
+    /* ── Loading ── */
+    #loading {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #1a2e0a, #0d1a05);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 200; transition: opacity .8s ease;
+    }
+    .ld-icon  { font-size: 52px; margin-bottom: 20px; animation: float 2s ease-in-out infinite; }
     @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-    .ld-title { color:#FFD49A;font-size:20px;letter-spacing:4px;margin-bottom:6px; }
-    .ld-sub   { color:rgba(255,212,154,.45);font-size:13px;margin-bottom:32px;letter-spacing:1px; }
-    .prog-wrap{ width:260px; }
-    .prog-bg  { width:100%;height:3px;background:rgba(255,212,154,.15);border-radius:2px;overflow:hidden;margin-bottom:10px; }
-    .prog-fill{ height:100%;background:linear-gradient(90deg,#FFB347,#FFD49A);border-radius:2px;width:0%;transition:width .3s ease; }
-    .prog-pct { text-align:center;color:rgba(255,212,154,.6);font-size:12px; }
-    .prog-fill.indeterminate{ width:40%!important;animation:shimmer 1.4s ease-in-out infinite;transform-origin:left; }
+    .ld-title { color: #FFD49A; font-size: 20px; letter-spacing: 4px; margin-bottom: 6px; }
+    .ld-sub   { color: rgba(255,212,154,.45); font-size: 13px; margin-bottom: 32px; letter-spacing: 1px; }
+    .prog-wrap { width: 260px; }
+    .prog-bg   { width:100%; height:3px; background:rgba(255,212,154,.15); border-radius:2px; overflow:hidden; margin-bottom:10px; }
+    .prog-fill { height:100%; background:linear-gradient(90deg,#FFB347,#FFD49A); border-radius:2px; width:0%; transition:width .3s ease; }
+    .prog-pct  { text-align:center; color:rgba(255,212,154,.6); font-size:12px; }
+    .prog-fill.indeterminate{ width:40%!important; animation:shimmer 1.4s ease-in-out infinite; transform-origin:left; }
     @keyframes shimmer{ 0%{transform:translateX(-100%);opacity:.6} 50%{opacity:1} 100%{transform:translateX(280%);opacity:.6} }
 
-    #app { opacity:0;transition:opacity 1s ease; }
+    /* ── Three.js canvas 透明叠在背景上 ── */
+    #app { opacity:0; transition:opacity 1s ease; position:relative; z-index:1; }
     #app.on { opacity:1; }
-    #vignette { position:fixed;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse at center,transparent 55%,rgba(10,8,30,.65) 100%); }
-    #badge { position:fixed;top:22px;left:28px;z-index:20;pointer-events:none;color:rgba(255,212,154,.35);font-size:12px;letter-spacing:3px;text-transform:uppercase; }
-    #hint  { position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:20;pointer-events:none;color:rgba(255,212,154,.3);font-size:11px;letter-spacing:2px;animation:hintFade 5s ease 1.5s forwards;opacity:0; }
+
+    /* 四周轻晕，增加景深感 */
+    #vignette {
+      position:fixed; inset:0; pointer-events:none; z-index:5;
+      background: radial-gradient(ellipse at center,
+        transparent 40%,
+        rgba(10,25,5,.45) 100%);
+    }
+
+    #badge {
+      position:fixed; top:22px; left:28px; z-index:20;
+      pointer-events:none; color:rgba(255,240,200,.6);
+      font-size:12px; letter-spacing:3px; text-transform:uppercase;
+      text-shadow: 0 1px 6px rgba(0,0,0,.4);
+    }
+    #hint {
+      position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+      z-index:20; pointer-events:none;
+      color:rgba(255,230,180,.5); font-size:11px; letter-spacing:2px;
+      animation:hintFade 5s ease 1.5s forwards; opacity:0;
+      text-shadow: 0 1px 4px rgba(0,0,0,.5);
+    }
     @keyframes hintFade{ 0%{opacity:0} 15%{opacity:1} 70%{opacity:1} 100%{opacity:0} }
 
-    #tip { position:fixed;z-index:30;pointer-events:none;transform:translate(-50%,calc(-100% - 14px));opacity:0;transition:opacity .18s ease; }
-    .tip-box { background:rgba(14,10,36,.88);border:1px solid rgba(255,212,154,.4);color:#FFD49A;padding:6px 16px;border-radius:20px;font-size:13px;white-space:nowrap;backdrop-filter:blur(10px);box-shadow:0 4px 20px rgba(0,0,0,.4); }
-    .tip-arr  { width:0;height:0;margin:0 auto;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid rgba(255,212,154,.4); }
+    #tip { position:fixed; z-index:30; pointer-events:none; transform:translate(-50%,calc(-100% - 14px)); opacity:0; transition:opacity .18s ease; }
+    .tip-box { background:rgba(20,40,5,.88); border:1px solid rgba(255,220,120,.5); color:#FFE08A; padding:6px 16px; border-radius:20px; font-size:13px; white-space:nowrap; backdrop-filter:blur(10px); box-shadow:0 4px 20px rgba(0,0,0,.4); }
+    .tip-arr  { width:0; height:0; margin:0 auto; border-left:6px solid transparent; border-right:6px solid transparent; border-top:6px solid rgba(255,220,120,.5); }
   </style>
 </head>
 <body>
 
+  <!-- 背景图层 -->
+  <div id="bg"></div>
+
+  <!-- Loading -->
   <div id="loading">
     <div class="ld-icon">🏠</div>
     <div class="ld-title">我的小屋</div>
@@ -44,6 +88,7 @@
     </div>
   </div>
 
+  <!-- App -->
   <div id="app">
     <div id="vignette"></div>
     <div id="badge">My Room</div>
@@ -61,8 +106,6 @@
 
   <script>
   (function(){
-
-    /* ══ 热点数据（已精确校准）══ */
     const SPOTS = [
       { id:'char', label:'关于我',   url:'about.html', pos:[-0.100, -0.500,  0.600] },
       { id:'tv',   label:'我的视频', url:'video.html', pos:[ 1.600, -0.300,  0.100] },
@@ -71,198 +114,148 @@
       { id:'cab',  label:'其他',     url:'links.html', pos:[ 1.200, -1.200,  1.600] },
     ];
 
-    /* ── Renderer ── */
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    /* ── Renderer：透明背景 ── */
+    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
     renderer.setSize(innerWidth, innerHeight);
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
     renderer.outputEncoding    = THREE.sRGBEncoding;
     renderer.toneMapping       = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = 1.05;
+    renderer.setClearColor(0x000000, 0);
     document.getElementById('app').appendChild(renderer.domElement);
 
-    /* ── Scene ── */
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1A1A2E);
-    scene.fog = new THREE.FogExp2(0x1A1A2E, 0.018);
+    // 不设背景色，完全透明，背景图透过来
+    scene.fog = new THREE.Fog(0x88bb44, 18, 35); // 轻微绿色雾，融合草地氛围
 
-    /* ── Stars ── */
-    (() => {
-      const pos = [];
-      for (let i = 0; i < 300; i++) {
-        const r = 30 + Math.random()*50;
-        const phi = Math.acos(2*Math.random()-1), theta = 2*Math.PI*Math.random();
-        pos.push(r*Math.sin(phi)*Math.cos(theta), r*Math.cos(phi), r*Math.sin(phi)*Math.sin(theta));
-      }
-      const g = new THREE.BufferGeometry();
-      g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-      scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color:0xffffff, size:0.07, sizeAttenuation:true })));
-    })();
-
-    /* ── Camera ── */
     const camera = new THREE.PerspectiveCamera(38, innerWidth/innerHeight, 0.1, 200);
-    camera.position.set(8, 8, 8);
-    camera.lookAt(0, 0.6, 0);
+    camera.position.set(8, 8, 8); camera.lookAt(0, 0.6, 0);
 
-    /* ── Controls ── */
     const ctrl = new THREE.OrbitControls(camera, renderer.domElement);
-    ctrl.target.set(0, 0, 0);
-    ctrl.enableDamping = true; ctrl.dampingFactor = 0.06;
-    ctrl.minDistance = 4; ctrl.maxDistance = 20;
-    ctrl.minPolarAngle = Math.PI * 0.12; ctrl.maxPolarAngle = Math.PI * 0.48;
-    ctrl.autoRotate = true; ctrl.autoRotateSpeed = 0.35;
-    ctrl.addEventListener('start', () => { ctrl.autoRotate = false; });
-    ctrl.update();
+    ctrl.target.set(0,0,0); ctrl.enableDamping=true; ctrl.dampingFactor=0.06;
+    ctrl.minDistance=4; ctrl.maxDistance=20;
+    ctrl.minPolarAngle=Math.PI*.12; ctrl.maxPolarAngle=Math.PI*.48;
+    ctrl.autoRotate=true; ctrl.autoRotateSpeed=0.35;
+    ctrl.addEventListener('start',()=>{ctrl.autoRotate=false;}); ctrl.update();
 
-    /* ── Lighting ── */
-    scene.add(new THREE.AmbientLight(0x7080a8, 0.55));
-    const warmLight = new THREE.PointLight(0xFFD49A, 2.8, 18);
-    warmLight.position.set(0.5, 4.5, 0.5);
-    warmLight.castShadow = true; warmLight.shadow.mapSize.set(1024, 1024);
+    /* 灯光调暖，匹配草地阳光氛围 */
+    scene.add(new THREE.AmbientLight(0xffe8b0, 0.8));
+    const sunLight = new THREE.DirectionalLight(0xffd080, 1.2);
+    sunLight.position.set(-5, 10, 5); sunLight.castShadow=true;
+    sunLight.shadow.mapSize.set(2048,2048); scene.add(sunLight);
+    const warmLight = new THREE.PointLight(0xFFD49A, 1.8, 18);
+    warmLight.position.set(0.5,4.5,0.5); warmLight.castShadow=true;
     scene.add(warmLight);
-    const fl = new THREE.DirectionalLight(0xFFE8C8, 0.35); fl.position.set(-6, 8, 4); scene.add(fl);
-    const rl = new THREE.DirectionalLight(0x6080AA, 0.25); rl.position.set(4, 2, -7); scene.add(rl);
+    const fillLight = new THREE.DirectionalLight(0xaaddaa, 0.4);
+    fillLight.position.set(5, 3, -5); scene.add(fillLight);
 
-    /* ── Glow texture ── */
-    const glowTex = (() => {
-      const s = 128, cv = document.createElement('canvas'); cv.width = cv.height = s;
-      const ctx = cv.getContext('2d'), h = s/2;
-      const g = ctx.createRadialGradient(h,h,0,h,h,h);
-      g.addColorStop(0,   'rgba(255,220,160,1)');
-      g.addColorStop(0.18,'rgba(255,200,120,0.85)');
-      g.addColorStop(0.5, 'rgba(255,180,80,0.35)');
-      g.addColorStop(1,   'rgba(255,160,60,0)');
-      ctx.fillStyle = g; ctx.fillRect(0,0,s,s);
-      return new THREE.CanvasTexture(cv);
+    /* Glow 热点纹理 */
+    const glowTex=(()=>{
+      const s=128,cv=document.createElement('canvas'); cv.width=cv.height=s;
+      const ctx=cv.getContext('2d'),h=s/2,g=ctx.createRadialGradient(h,h,0,h,h,h);
+      g.addColorStop(0,'rgba(255,220,100,1)');
+      g.addColorStop(.18,'rgba(255,200,80,.85)');
+      g.addColorStop(.5,'rgba(255,180,60,.35)');
+      g.addColorStop(1,'rgba(255,160,40,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,s,s); return new THREE.CanvasTexture(cv);
     })();
 
-    /* ── Hotspots ── */
-    const hitMeshes = [], sprites = [];
-    SPOTS.forEach((def, i) => {
-      const p = new THREE.Vector3(...def.pos);
-
-      const sp = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: glowTex, transparent: true,
-        depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.55
-      }));
-      sp.position.copy(p); sp.scale.set(0.6, 0.6, 0.6);
-      sp.userData = { def, hovered: false };
+    const hitMeshes=[], sprites=[];
+    SPOTS.forEach((def,i)=>{
+      const p=new THREE.Vector3(...def.pos);
+      const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.55}));
+      sp.position.copy(p); sp.scale.set(.6,.6,.6); sp.userData={def,hovered:false};
       scene.add(sp); sprites.push(sp);
-
-      const hit = new THREE.Mesh(
-        new THREE.SphereGeometry(0.38, 8, 8),
-        new THREE.MeshBasicMaterial({ visible: false })
-      );
-      hit.position.copy(p); hit.userData = { def, si: i };
+      const hit=new THREE.Mesh(new THREE.SphereGeometry(.38,8,8),new THREE.MeshBasicMaterial({visible:false}));
+      hit.position.copy(p); hit.userData={def,si:i};
       scene.add(hit); hitMeshes.push(hit);
     });
 
-    /* ── Load GLB ── */
-    const pf = document.getElementById('pf'), pp = document.getElementById('pp');
-    const ldEl = document.getElementById('loading'), app = document.getElementById('app');
+    /* 加载 GLB */
+    const pf=document.getElementById('pf'),pp=document.getElementById('pp');
+    const ldEl=document.getElementById('loading'),app=document.getElementById('app');
 
-    MeshoptDecoder.ready.then(() => {
-      const loader = new THREE.GLTFLoader();
-      loader.setMeshoptDecoder(MeshoptDecoder);
-      loader.load(
-        'Meshy_AI_Cozy_Voxel_Living_Roo_0409084450_texture-v1.glb',
-        gltf => {
-          const model = gltf.scene;
-          const box  = new THREE.Box3().setFromObject(model);
-          const size = box.getSize(new THREE.Vector3());
-          const ctr  = box.getCenter(new THREE.Vector3());
-          const sc   = 4 / Math.max(size.x, size.y, size.z);
-          model.scale.setScalar(sc);
-          model.position.set(-ctr.x*sc, -ctr.y*sc, -ctr.z*sc);
-          model.traverse(c => { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true; } });
+    MeshoptDecoder.ready.then(()=>{
+      const loader=new THREE.GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
+      loader.load('Meshy_AI_Cozy_Voxel_Living_Roo_0409084450_texture-v1.glb',
+        gltf=>{
+          const model=gltf.scene;
+          const box=new THREE.Box3().setFromObject(model);
+          const size=box.getSize(new THREE.Vector3()),ctr=box.getCenter(new THREE.Vector3());
+          const sc=4/Math.max(size.x,size.y,size.z);
+          model.scale.setScalar(sc); model.position.set(-ctr.x*sc,-ctr.y*sc,-ctr.z*sc);
+          const maxAniso=renderer.capabilities.getMaxAnisotropy();
+          model.traverse(c=>{
+            if(!c.isMesh) return;
+            c.castShadow=true; c.receiveShadow=true;
+            c.material.polygonOffset=true; c.material.polygonOffsetFactor=1; c.material.polygonOffsetUnits=1;
+            [c.material.map,c.material.normalMap,c.material.roughnessMap].forEach(tex=>{
+              if(tex){tex.anisotropy=maxAniso;tex.minFilter=THREE.LinearMipmapLinearFilter;tex.needsUpdate=true;}
+            });
+          });
           scene.add(model);
-
-          pf.style.width = '100%'; pp.textContent = '100%';
-          setTimeout(() => {
-            ldEl.style.opacity = '0';
-            setTimeout(() => { ldEl.style.display = 'none'; app.classList.add('on'); }, 850);
-          }, 350);
+          pf.style.width='100%'; pp.textContent='100%';
+          setTimeout(()=>{
+            ldEl.style.opacity='0';
+            setTimeout(()=>{ldEl.style.display='none';app.classList.add('on');},850);
+          },350);
         },
-        xhr => {
-          if (xhr.total > 0) {
-            pf.classList.remove('indeterminate');
-            const pct = Math.round(xhr.loaded/xhr.total*100);
-            pf.style.width = pct+'%'; pp.textContent = pct+'%';
-          } else {
-            pf.classList.add('indeterminate');
-            pp.textContent = (xhr.loaded/1024/1024).toFixed(1)+' MB 加载中…';
-          }
+        xhr=>{
+          if(xhr.total>0){pf.classList.remove('indeterminate');const pct=Math.round(xhr.loaded/xhr.total*100);pf.style.width=pct+'%';pp.textContent=pct+'%';}
+          else{pf.classList.add('indeterminate');pp.textContent=(xhr.loaded/1024/1024).toFixed(1)+' MB 加载中…';}
         },
-        err => {
-          console.error(err);
-          document.querySelector('.ld-sub').textContent = '模型加载失败，请检查文件名';
-          pp.textContent = '✕'; pf.style.background = '#ff6b6b';
-        }
+        err=>{console.error(err);document.querySelector('.ld-sub').textContent='模型加载失败';pp.textContent='✕';pf.style.background='#ff6b6b';}
       );
     });
 
-    /* ── Interaction ── */
-    const rc = new THREE.Raycaster(), mse = new THREE.Vector2();
-    const tip = document.getElementById('tip'), tipTxt = document.getElementById('tip-text');
-    let active = null;
+    /* 交互 */
+    const rc=new THREE.Raycaster(),mse=new THREE.Vector2();
+    const tip=document.getElementById('tip'),tipTxt=document.getElementById('tip-text');
+    let active=null;
 
-    function updateMouse(e) {
-      const r = renderer.domElement.getBoundingClientRect();
-      mse.x =  ((e.clientX - r.left) / r.width)  * 2 - 1;
-      mse.y = -((e.clientY - r.top)  / r.height) * 2 + 1;
-    }
+    function updateMouse(e){const r=renderer.domElement.getBoundingClientRect();mse.x=((e.clientX-r.left)/r.width)*2-1;mse.y=-((e.clientY-r.top)/r.height)*2+1;}
 
-    renderer.domElement.addEventListener('mousemove', e => {
-      updateMouse(e); rc.setFromCamera(mse, camera);
-      const hits = rc.intersectObjects(hitMeshes);
-      if (hits.length) {
-        const si = hits[0].object.userData.si;
-        if (active !== sprites[si]) {
-          if (active) active.userData.hovered = false;
-          active = sprites[si]; active.userData.hovered = true;
-        }
-        renderer.domElement.style.cursor = 'pointer';
-        tipTxt.textContent = hits[0].object.userData.def.label;
-        tip.style.left = e.clientX+'px'; tip.style.top = e.clientY+'px'; tip.style.opacity = '1';
+    renderer.domElement.addEventListener('mousemove',e=>{
+      updateMouse(e); rc.setFromCamera(mse,camera);
+      const hits=rc.intersectObjects(hitMeshes);
+      if(hits.length){
+        const si=hits[0].object.userData.si;
+        if(active!==sprites[si]){if(active)active.userData.hovered=false;active=sprites[si];active.userData.hovered=true;}
+        renderer.domElement.style.cursor='pointer';
+        tipTxt.textContent=hits[0].object.userData.def.label;
+        tip.style.left=e.clientX+'px'; tip.style.top=e.clientY+'px'; tip.style.opacity='1';
       } else {
-        if (active) { active.userData.hovered = false; active = null; }
-        renderer.domElement.style.cursor = 'default'; tip.style.opacity = '0';
+        if(active){active.userData.hovered=false;active=null;}
+        renderer.domElement.style.cursor='default'; tip.style.opacity='0';
       }
     });
 
-    renderer.domElement.addEventListener('click', e => {
-      updateMouse(e); rc.setFromCamera(mse, camera);
-      const hits = rc.intersectObjects(hitMeshes);
-      if (hits.length) window.location.href = hits[0].object.userData.def.url;
+    renderer.domElement.addEventListener('click',e=>{
+      updateMouse(e); rc.setFromCamera(mse,camera);
+      const hits=rc.intersectObjects(hitMeshes);
+      if(hits.length) window.location.href=hits[0].object.userData.def.url;
     });
 
-    renderer.domElement.addEventListener('mouseleave', () => {
-      tip.style.opacity = '0';
-      if (active) { active.userData.hovered = false; active = null; }
-    });
+    renderer.domElement.addEventListener('mouseleave',()=>{tip.style.opacity='0';if(active){active.userData.hovered=false;active=null;}});
 
-    /* ── Animation ── */
-    let t = 0;
-    (function animate() {
-      requestAnimationFrame(animate); t += 0.016; ctrl.update();
-      sprites.forEach((sp, i) => {
-        const h = sp.userData.hovered;
-        sp.material.opacity = h ? 0.95 : 0.4 + 0.25 * Math.sin(t*2.2 + i*1.4);
-        const s = h ? 0.95 : 0.55 + 0.08 * Math.sin(t*1.8 + i*1.1);
-        sp.scale.set(s, s, s);
+    let t=0;
+    (function animate(){
+      requestAnimationFrame(animate); t+=.016; ctrl.update();
+      sprites.forEach((sp,i)=>{
+        const h=sp.userData.hovered;
+        sp.material.opacity=h?.95:.4+.25*Math.sin(t*2.2+i*1.4);
+        const s=h?.95:.55+.08*Math.sin(t*1.8+i*1.1); sp.scale.set(s,s,s);
       });
-      warmLight.intensity = 2.8 + 0.18 * Math.sin(t*1.9);
-      renderer.render(scene, camera);
+      warmLight.intensity=1.8+.15*Math.sin(t*1.9);
+      renderer.render(scene,camera);
     })();
 
-    /* ── Resize ── */
-    window.addEventListener('resize', () => {
-      camera.aspect = innerWidth/innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(innerWidth, innerHeight);
+    window.addEventListener('resize',()=>{
+      camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth,innerHeight);
     });
-
   })();
   </script>
 </body>
