@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>热点坐标调试器</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:#1A1A2E;color:#FFD49A;font-family:'Microsoft YaHei',sans-serif;display:flex;height:100vh;overflow:hidden;}
+
+    /* 左侧3D视图 */
+    #view{flex:1;position:relative;}
+    #view canvas{display:block;}
+
+    /* 右侧控制面板 */
+    #panel{width:300px;background:rgba(10,8,28,.95);border-left:1px solid rgba(255,212,154,.2);display:flex;flex-direction:column;overflow-y:auto;}
+
+    .panel-title{padding:16px 20px;font-size:15px;font-weight:bold;border-bottom:1px solid rgba(255,212,154,.15);letter-spacing:2px;}
+
+    .spot-card{border-bottom:1px solid rgba(255,212,154,.1);padding:14px 16px;}
+    .spot-card.active{background:rgba(255,180,60,.1);}
+
+    .spot-name{font-size:13px;font-weight:bold;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:8px;}
+    .spot-dot{width:10px;height:10px;border-radius:50%;background:#FFD49A;flex-shrink:0;}
+    .spot-card.active .spot-dot{background:#FFB347;box-shadow:0 0 6px #FFB347;}
+
+    .axis-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+    .axis-label{width:14px;font-size:11px;color:rgba(255,212,154,.5);text-align:center;}
+    .axis-val{flex:1;text-align:center;font-size:13px;font-family:monospace;background:rgba(255,212,154,.08);border-radius:4px;padding:3px 0;}
+    .btn{width:28px;height:28px;border-radius:4px;border:1px solid rgba(255,212,154,.3);background:rgba(255,212,154,.06);color:#FFD49A;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0;user-select:none;}
+    .btn:hover{background:rgba(255,180,60,.25);border-color:#FFD49A;}
+    .btn:active{background:rgba(255,180,60,.45);transform:scale(.95);}
+
+    .step-row{display:flex;align-items:center;gap:6px;margin-top:4px;margin-bottom:2px;}
+    .step-label{font-size:10px;color:rgba(255,212,154,.4);}
+    .step-btn{padding:2px 8px;border-radius:10px;border:1px solid rgba(255,212,154,.25);background:transparent;color:rgba(255,212,154,.5);font-size:10px;cursor:pointer;}
+    .step-btn.active{background:rgba(255,180,60,.2);color:#FFD49A;border-color:#FFD49A;}
+
+    /* 底部保存区 */
+    #bottom{padding:16px;border-top:1px solid rgba(255,212,154,.15);margin-top:auto;}
+    #save-btn{width:100%;padding:10px;border-radius:20px;border:1px solid #FFD49A;background:rgba(255,180,60,.2);color:#FFD49A;font-size:13px;cursor:pointer;letter-spacing:1px;}
+    #save-btn:hover{background:rgba(255,180,60,.4);}
+    #code-out{margin-top:10px;background:rgba(0,0,0,.4);border-radius:6px;padding:10px;font-size:10px;font-family:monospace;color:rgba(255,212,154,.7);white-space:pre;overflow-x:auto;display:none;}
+
+    #tip-bar{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(14,10,36,.85);border:1px solid rgba(255,212,154,.3);border-radius:20px;padding:6px 18px;font-size:12px;pointer-events:none;color:rgba(255,212,154,.7);}
+  </style>
+</head>
+<body>
+
+<div id="view">
+  <div id="tip-bar">拖动旋转视角 · 右侧面板调整热点位置</div>
+</div>
+
+<div id="panel">
+  <div class="panel-title">🎯 热点坐标调试器</div>
+
+  <div id="cards"></div>
+
+  <div id="bottom">
+    <button id="save-btn">💾 复制坐标代码</button>
+    <div id="code-out"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meshoptimizer@0.18.1/meshopt_decoder.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════
+   热点数据 — 在右侧面板调整后点"复制坐标代码"
+   把输出的数组粘贴到 index.html 里即可
+═══════════════════════════════════════════════ */
+const SPOTS = [
+  { id:'char', label:'👤 关于我',   color:'#FF9966', pos:[ 0.2,  0.0,  0.3] },
+  { id:'tv',   label:'📺 我的视频', color:'#66AAFF', pos:[ 1.5,  0.0, -0.5] },
+  { id:'pic',  label:'🖼 我的相册', color:'#FF66AA', pos:[-1.8,  0.5, -0.5] },
+  { id:'book', label:'📝 学习笔记', color:'#66FFAA', pos:[-1.2, -0.5,  0.2] },
+  { id:'cab',  label:'🗄 其他',     color:'#FFDD66', pos:[ 1.8, -0.5,  0.8] },
+];
+
+let step = 0.1;
+
+/* ══ Three.js ══ */
+const viewEl = document.getElementById('view');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+function resize() {
+  const w = viewEl.clientWidth, h = viewEl.clientHeight;
+  renderer.setSize(w, h); camera.aspect = w/h; camera.updateProjectionMatrix();
+}
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled = true; renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
+viewEl.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1A1A2E);
+scene.fog = new THREE.FogExp2(0x1A1A2E, 0.018);
+
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 200);
+camera.position.set(8,8,8); camera.lookAt(0,0.6,0);
+
+const ctrl = new THREE.OrbitControls(camera, renderer.domElement);
+ctrl.target.set(0,0,0); ctrl.enableDamping=true; ctrl.dampingFactor=.06;
+ctrl.minDistance=3; ctrl.maxDistance=18; ctrl.autoRotate=false; ctrl.update();
+
+scene.add(new THREE.AmbientLight(0x7080a8,.6));
+const wl=new THREE.PointLight(0xFFD49A,3,18); wl.position.set(.5,4.5,.5); wl.castShadow=true; scene.add(wl);
+const dl=new THREE.DirectionalLight(0xFFE8C8,.4); dl.position.set(-6,8,4); scene.add(dl);
+
+/* 热点球体（彩色，好辨认）*/
+const hsMeshes = SPOTS.map(def => {
+  const g = new THREE.SphereGeometry(0.12, 12, 12);
+  const m = new THREE.MeshPhongMaterial({ color: def.color, emissive: def.color, emissiveIntensity: 0.6 });
+  const mesh = new THREE.Mesh(g, m);
+  mesh.position.set(...def.pos);
+  // 标签 sprite
+  const canvas = document.createElement('canvas'); canvas.width=200; canvas.height=52;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle='rgba(14,10,36,.85)';
+  ctx.beginPath(); ctx.roundRect(0,0,200,52,12); ctx.fill();
+  ctx.strokeStyle=def.color; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle=def.color; ctx.font='bold 18px Microsoft YaHei'; ctx.textAlign='center';
+  ctx.fillText(def.label, 100, 33);
+  const tex = new THREE.CanvasTexture(canvas);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false}));
+  sp.scale.set(1.1,.28,.28); sp.position.set(0,.28,0);
+  mesh.add(sp);
+  scene.add(mesh);
+  return mesh;
+});
+
+/* 坐标轴辅助线（小，在模型中心）*/
+scene.add(new THREE.AxesHelper(0.5));
+
+/* 加载模型 */
+MeshoptDecoder.ready.then(()=>{
+  const loader=new THREE.GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
+  loader.load('Meshy_AI_Cozy_Voxel_Living_Roo_0409084450_texture-v1.glb', gltf=>{
+    const model=gltf.scene;
+    const box=new THREE.Box3().setFromObject(model);
+    const size=box.getSize(new THREE.Vector3()), ctr=box.getCenter(new THREE.Vector3());
+    const sc=4/Math.max(size.x,size.y,size.z);
+    model.scale.setScalar(sc); model.position.set(-ctr.x*sc,-ctr.y*sc,-ctr.z*sc);
+    model.traverse(c=>{if(c.isMesh){c.castShadow=true;c.receiveShadow=true;}});
+    scene.add(model);
+    document.getElementById('tip-bar').textContent='模型加载完成 ✓ · 用右侧按钮精确调整热点';
+  },
+  xhr=>{ if(xhr.total>0) document.getElementById('tip-bar').textContent='加载中 '+Math.round(xhr.loaded/xhr.total*100)+'%…'; },
+  ()=>{ document.getElementById('tip-bar').textContent='⚠️ 模型未找到，请确认文件名一致'; }
+  );
+});
+
+/* 动画 */
+let t=0;
+(function animate(){
+  requestAnimationFrame(animate); t+=.016; ctrl.update();
+  wl.intensity=2.8+.18*Math.sin(t*1.9);
+  hsMeshes.forEach((m,i)=>{
+    m.material.emissiveIntensity=.5+.3*Math.sin(t*2+i*1.2);
+  });
+  renderer.render(scene,camera);
+})();
+window.addEventListener('resize', resize); resize();
+
+/* ══ 面板 UI ══ */
+function updateMesh(idx) {
+  const p=SPOTS[idx].pos;
+  hsMeshes[idx].position.set(p[0],p[1],p[2]);
+}
+
+function makeCard(def, idx) {
+  const card=document.createElement('div'); card.className='spot-card'; card.id='card-'+idx;
+  card.innerHTML=`
+    <div class="spot-name" onclick="selectCard(${idx})">
+      <div class="spot-dot" style="background:${def.color};box-shadow:0 0 5px ${def.color}"></div>
+      ${def.label}
+    </div>
+    <div class="step-row">
+      <span class="step-label">步长：</span>
+      <button class="step-btn ${step===0.5?'active':''}" onclick="setStep(0.5,${idx})">0.5</button>
+      <button class="step-btn ${step===0.1?'active':''}" onclick="setStep(0.1,${idx})">0.1</button>
+      <button class="step-btn ${step===0.05?'active':''}" onclick="setStep(0.05,${idx})">0.05</button>
+    </div>
+    ${['x','y','z'].map((ax,ai)=>`
+    <div class="axis-row">
+      <span class="axis-label">${ax}</span>
+      <button class="btn" onclick="nudge(${idx},${ai},-1)">−</button>
+      <div class="axis-val" id="v-${idx}-${ai}">${def.pos[ai].toFixed(3)}</div>
+      <button class="btn" onclick="nudge(${idx},${ai},+1)">+</button>
+    </div>`).join('')}
+  `;
+  return card;
+}
+
+const cardsEl=document.getElementById('cards');
+SPOTS.forEach((def,i)=>cardsEl.appendChild(makeCard(def,i)));
+
+function selectCard(idx){
+  document.querySelectorAll('.spot-card').forEach((c,i)=>c.classList.toggle('active',i===idx));
+  // 相机平滑看向该热点
+  const p=SPOTS[idx].pos; ctrl.target.set(p[0],p[1],p[2]); ctrl.update();
+}
+
+function setStep(s, idx){
+  step=s;
+  // 刷新所有步长按钮
+  document.querySelectorAll('.step-btn').forEach(btn=>{
+    btn.classList.toggle('active', parseFloat(btn.textContent)===s);
+  });
+}
+
+function nudge(idx,axis,dir){
+  SPOTS[idx].pos[axis]=+(SPOTS[idx].pos[axis]+dir*step).toFixed(3);
+  document.getElementById('v-'+idx+'-'+axis).textContent=SPOTS[idx].pos[axis].toFixed(3);
+  updateMesh(idx);
+  // 激活对应卡片
+  selectCard(idx);
+}
+
+// 键盘快捷键（选中卡片后用方向键/WASD调整）
+let activeIdx=0; selectCard(0);
+document.addEventListener('keydown',e=>{
+  const map={'ArrowLeft':[[0,-1]],'ArrowRight':[[0,1]],'ArrowUp':[[2,-1]],'ArrowDown':[[2,1]],
+             'PageUp':[[1,1]],'PageDown':[[1,-1]],'1':null,'2':null,'3':null,'4':null,'5':null};
+  if(e.key>='1'&&e.key<='5'){activeIdx=+e.key-1;selectCard(activeIdx);return;}
+  if(map[e.key]){e.preventDefault();nudge(activeIdx,...map[e.key][0]);}
+});
+
+document.getElementById('save-btn').addEventListener('click',()=>{
+  let code='const SPOTS = [\n';
+  SPOTS.forEach(d=>{
+    code+=`  { id:'${d.id}', label:'${d.label.replace(/[^\w\u4e00-\u9fa5]/g,'')}', url:'${d.id==='char'?'about':d.id==='tv'?'video':d.id==='pic'?'photo':d.id==='book'?'notes':'links'}.html', pos:[${d.pos[0].toFixed(3)}, ${d.pos[1].toFixed(3)}, ${d.pos[2].toFixed(3)}] },\n`;
+  });
+  code+='];';
+  const out=document.getElementById('code-out');
+  out.textContent=code; out.style.display='block';
+  navigator.clipboard.writeText(code).then(()=>{
+    document.getElementById('save-btn').textContent='✅ 已复制到剪贴板！';
+    setTimeout(()=>{document.getElementById('save-btn').textContent='💾 复制坐标代码';},2500);
+  });
+});
+</script>
+</body>
+</html>
