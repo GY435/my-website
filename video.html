@@ -1,102 +1,338 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>视频作品 · 我的小屋</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>视频作品 · 我的小屋</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
 
-    body {
-      min-height: 100vh;
-      font-family: 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-      display: flex; align-items: center; justify-content: center;
-      background:
-        repeating-linear-gradient(94deg,
-          transparent, transparent 18px,
-          rgba(139,105,50,.04) 18px, rgba(139,105,50,.04) 19px),
-        linear-gradient(155deg, #FAF0E0 0%, #EDDFBF 45%, #DCC9A4 100%);
-    }
+:root {
+  --brown: #9E5C2C;
+  --brown2: #C8844A;
+  --brown3: #7A4020;
+  --text: #3E2208;
+  --muted: #7A5520;
+  --muted2: rgba(122,85,32,0.55);
+  --border: rgba(200,165,110,0.35);
+  --shadow: rgba(100,70,30,0.15);
+  --card: rgba(255,251,242,0.95);
+}
 
-    .card {
-      text-align: center;
-      padding: 56px 72px;
-      background: rgba(255,251,242,.9);
-      border-radius: 22px;
-      box-shadow:
-        0 2px 0 rgba(255,255,255,.8) inset,
-        0 10px 48px rgba(100,70,30,.18),
-        0 1px 4px rgba(100,70,30,.12);
-      border: 1px solid rgba(200,165,110,.38);
-      max-width: 460px; width: calc(100% - 40px);
-      animation: cardIn .6s cubic-bezier(.34,1.56,.64,1) both;
-    }
+html { scroll-behavior:smooth; }
 
-    @keyframes cardIn {
-      from { opacity: 0; transform: translateY(22px) scale(.96); }
-      to   { opacity: 1; transform: none; }
-    }
+body {
+  font-family:'PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif;
+  min-height:100vh; color:var(--text);
+  background:
+    repeating-linear-gradient(94deg,
+      transparent,transparent 18px,
+      rgba(139,105,50,.03) 18px,rgba(139,105,50,.03) 19px),
+    linear-gradient(150deg,#FBF3E2 0%,#EFE0C0 50%,#E2CFA8 100%);
+  background-attachment:fixed;
+}
 
-    .icon {
-      font-size: 62px; margin-bottom: 18px; display: block;
-      animation: iconBounce .5s ease .2s both;
-    }
+/* ── 顶部导航 ── */
+.topbar {
+  position:sticky; top:0; z-index:100;
+  background:rgba(245,236,215,0.92);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  padding:0.85rem 2rem;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.topbar-title { font-size:1.1rem; font-weight:700; color:var(--brown3); }
+.topbar-sub { font-size:0.78rem; color:var(--muted2); margin-top:2px; }
 
-    @keyframes iconBounce {
-      from { opacity: 0; transform: scale(.5) rotate(-15deg); }
-      to   { opacity: 1; transform: none; }
-    }
+.back-btn {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:0.55rem 1.3rem;
+  background:linear-gradient(135deg,var(--brown),var(--brown2));
+  color:#fff; text-decoration:none; border-radius:28px; font-size:0.85rem;
+  box-shadow:0 3px 12px rgba(158,92,44,0.3);
+  transition:all 0.25s ease;
+}
+.back-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(158,92,44,0.4); }
 
-    h1 {
-      color: #3E2208; font-size: 26px;
-      font-weight: 600; letter-spacing: 2px; margin-bottom: 6px;
-    }
+/* ── 主体 ── */
+.main { max-width:900px; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
 
-    .divider {
-      width: 48px; height: 2px; margin: 14px auto 16px;
-      background: linear-gradient(90deg, transparent, #C8944A, transparent);
-    }
+/* ── Hero ── */
+.hero-card {
+  background:var(--card);
+  border-radius:20px; border:1px solid var(--border);
+  box-shadow:0 8px 40px var(--shadow),0 1px 0 rgba(255,255,255,.8) inset;
+  padding:2.5rem 2rem 2rem; text-align:center; margin-bottom:2rem;
+  animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes cardIn { from{opacity:0;transform:translateY(16px) scale(.97)} to{opacity:1;transform:none} }
 
-    .msg {
-      color: #7A5520; font-size: 15px; line-height: 1.9; margin-bottom: 8px;
-    }
+.hero-icon { font-size:3rem; margin-bottom:0.8rem; display:block; }
+.hero-title { font-size:1.8rem; font-weight:700; color:var(--text); margin-bottom:0.5rem; }
+.hero-divider { width:48px; height:2px; margin:0.9rem auto; background:linear-gradient(90deg,transparent,var(--brown2),transparent); }
+.hero-desc { font-size:0.95rem; color:var(--muted); line-height:1.8; }
 
-    .sub {
-      color: rgba(122,85,32,.55); font-size: 13px; margin-bottom: 36px;
-    }
+/* ── 视频卡片 ── */
+.video-card {
+  background:var(--card);
+  border-radius:18px; border:1px solid var(--border);
+  box-shadow:0 4px 24px var(--shadow);
+  overflow:hidden; margin-bottom:2rem;
+  animation:fadeUp .5s ease both;
+}
+.video-card:nth-child(1){ animation-delay:.05s }
+.video-card:nth-child(2){ animation-delay:.1s }
+.video-card:nth-child(3){ animation-delay:.15s }
+.video-card:nth-child(4){ animation-delay:.2s }
 
-    .back {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: linear-gradient(135deg, #9E5C2C, #C8844A);
-      color: #fff; text-decoration: none;
-      padding: 11px 28px; border-radius: 28px;
-      font-size: 14px; letter-spacing: .5px;
-      box-shadow: 0 3px 14px rgba(158,92,44,.32);
-      transition: all .28s ease;
-    }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
 
-    .back:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 22px rgba(158,92,44,.42);
-      background: linear-gradient(135deg, #884E25, #B5743B);
-    }
+/* 视频播放器 */
+.video-wrap {
+  position:relative;
+  background:#1a0e05;
+  aspect-ratio:16/9;
+}
+.video-wrap video {
+  width:100%; height:100%;
+  object-fit:contain; display:block;
+}
 
-    .back:active { transform: none; }
-  </style>
+/* 视频序号标签 */
+.video-badge {
+  position:absolute; top:0.8rem; left:0.8rem; z-index:2;
+  background:linear-gradient(135deg,var(--brown),var(--brown2));
+  color:#fff; font-size:0.7rem; font-weight:600;
+  padding:0.25rem 0.7rem; border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* AI标签 */
+.ai-badge {
+  position:absolute; top:0.8rem; right:0.8rem; z-index:2;
+  background:linear-gradient(135deg,#6e3bff,#c23eff);
+  color:#fff; font-size:0.65rem; font-weight:600;
+  padding:0.2rem 0.6rem; border-radius:12px;
+}
+
+/* 视频信息区 */
+.video-info { padding:1.4rem 1.6rem 1.6rem; }
+
+.video-title {
+  font-size:1.1rem; font-weight:700; color:var(--text);
+  margin-bottom:0.35rem;
+}
+.video-sub {
+  font-size:0.82rem; color:var(--muted2); margin-bottom:1.1rem;
+  display:flex; align-items:center; gap:0.5rem;
+}
+.video-tag {
+  background:rgba(200,132,74,0.12);
+  color:var(--brown); font-size:0.7rem;
+  padding:0.15rem 0.55rem; border-radius:10px;
+  border:1px solid rgba(200,132,74,0.25);
+}
+
+/* 提示词区域 */
+.prompt-section { margin-top:0; }
+
+.prompt-block {
+  background:#fdf6ee; border-radius:10px;
+  border:1px dashed rgba(200,132,74,0.4);
+  padding:0.9rem 1rem;
+  margin-bottom:0.7rem;
+}
+.prompt-block:last-child { margin-bottom:0; }
+
+.prompt-label {
+  font-size:0.7rem; color:var(--brown2); font-weight:700;
+  letter-spacing:0.08em; margin-bottom:0.45rem;
+  display:flex; align-items:center; gap:0.4rem;
+}
+.prompt-label .pl-tag {
+  background:var(--brown2); color:#fff;
+  font-size:0.6rem; padding:0.1rem 0.45rem;
+  border-radius:8px; font-weight:600;
+}
+
+.prompt-text {
+  font-size:0.8rem; color:var(--muted); line-height:1.75;
+  max-height:3.8em; overflow:hidden;
+  position:relative; transition:max-height 0.4s ease;
+}
+.prompt-text.expanded { max-height:999px; }
+.prompt-text::after {
+  content:''; position:absolute; bottom:0; left:0; right:0;
+  height:1.5em;
+  background:linear-gradient(transparent,#fdf6ee);
+  pointer-events:none; transition:opacity .3s;
+}
+.prompt-text.expanded::after { opacity:0; }
+
+.prompt-toggle {
+  font-size:0.73rem; color:var(--brown); cursor:pointer;
+  margin-top:0.4rem; display:inline-block;
+  text-decoration:underline; text-underline-offset:2px;
+  transition:color .2s;
+}
+.prompt-toggle:hover { color:var(--brown3); }
+
+/* ── 底部 ── */
+.footer { text-align:center; margin-top:1rem; padding-bottom:1rem; }
+
+.footer-note {
+  font-size:0.82rem; color:var(--muted2);
+  margin-bottom:1.5rem; line-height:1.8;
+}
+</style>
 </head>
 <body>
-  <div class="card">
-    <span class="icon">🎬</span>
-    <h1>视频作品</h1>
-    <div class="divider"></div>
-    <p class="msg">创意影像正在剪辑装帧<br>内容即将上线</p>
-    <p class="sub">感谢您的耐心等待 ✨</p>
-    <a class="back" href="index.html">
-      <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10 12L6 8l4-4"/>
-      </svg>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-title">🎬 我的视频</div>
+    <div class="topbar-sub">AI 生成的影像创作</div>
+  </div>
+  <a href="index.html" class="back-btn">
+    <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
+    返回小屋
+  </a>
+</div>
+
+<div class="main">
+
+  <div class="hero-card">
+    <span class="hero-icon">🎬</span>
+    <h1 class="hero-title">我的视频</h1>
+    <div class="hero-divider"></div>
+    <p class="hero-desc">这里收录了用 AI 工具生成的影像作品，每个视频下方附有完整的创作提示词。<br>点击视频即可播放。</p>
+  </div>
+
+  <!-- ══ Video 1 ══ -->
+  <div class="video-card">
+    <div class="video-wrap">
+      <span class="video-badge">01</span>
+      <span class="ai-badge">🤖 AI Generated</span>
+      <video controls preload="metadata" poster="">
+        <source src="Video/video1.mp4" type="video/mp4">
+        您的浏览器不支持视频播放
+      </video>
+    </div>
+    <div class="video-info">
+      <div class="video-title">古风美人·暗夜微光</div>
+      <div class="video-sub">
+        <span class="video-tag">图生视频</span>
+        <span class="video-tag">东方风格</span>
+        <span class="video-tag">Vidu Q3 Pro</span>
+      </div>
+      <div class="prompt-section">
+        <div class="prompt-block">
+          <div class="prompt-label"><span class="pl-tag">STEP 1</span> 图片生成提示词</div>
+          <div class="prompt-text" id="p1a">高级CG，美少女，厚涂，全身像，精致刻画，流畅的线条，神秘感，近距离，高清，8K，动态视角，纯欲系，皮草，复古装饰，银饰，金属额饰，碎发随风摆动，复古发饰，超长流苏，很多细碎辫子，人物POS特写，精致刻画，流畅的线条，神秘感，深邃感，极繁风格，发丝细腻富有光泽，近距离肖像画，狭长凤眼，绝美眼睛，瓷白如玉的肌肤，肌肤纹理，面部光影，笔触，线条清晰，高级感，清冷，五官精致，精致感，高质量，柔焦，细节刻画，超高清，32K，大师级光影，明暗对比，杰出。人物正面，人物写真，华灯初上背景，航拍视角，厚涂，艺术氛围感加强，人物特写，动态视角，繁复纱质感服饰，华丽繁复的饰品，强调发型，透视感强烈，细节丰富，伦勃朗光，明暗对比强烈。强调人物轮廓，整体呈现梦幻感与电影风碰撞的美感。采用动态角度，画面以暗冷色调为基调，东方风格服饰闪粉光点，朦胧且梦幻的感觉。3D渲染 身材极好。暗夜微光背景衬托，极致超高清呈现的精致美感</div>
+          <span class="prompt-toggle" onclick="togglePrompt('p1a',this)">展开全部 ↓</span>
+        </div>
+        <div class="prompt-block">
+          <div class="prompt-label"><span class="pl-tag">STEP 2</span> 视频生成提示词</div>
+          <div class="prompt-text" id="p1b">女生发小脾气。哼，不理你了。转过身。又转过来。说你不哄哄我吗？</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Video 2 ══ -->
+  <div class="video-card">
+    <div class="video-wrap">
+      <span class="video-badge">02</span>
+      <span class="ai-badge">🤖 AI Generated</span>
+      <video controls preload="metadata">
+        <source src="Video/video2.mp4" type="video/mp4">
+        您的浏览器不支持视频播放
+      </video>
+    </div>
+    <div class="video-info">
+      <div class="video-title">魔法森林·小精灵引路</div>
+      <div class="video-sub">
+        <span class="video-tag">文生视频</span>
+        <span class="video-tag">治愈童话</span>
+        <span class="video-tag">马卡龙色调</span>
+      </div>
+      <div class="prompt-section">
+        <div class="prompt-block">
+          <div class="prompt-label"><span class="pl-tag">PROMPT</span> 视频生成提示词</div>
+          <div class="prompt-text" id="p2a">魔法森林里，小精灵与巨型发光蘑菇相互配合将迷路的小鹿引向回家的路，萤火虫环绕飞舞，镜头缓缓跟随小鹿低角度移动，马卡龙柔和色调，治愈系童话动画风格</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Video 3 ══ -->
+  <div class="video-card">
+    <div class="video-wrap">
+      <span class="video-badge">03</span>
+      <span class="ai-badge">🤖 AI Generated</span>
+      <video controls preload="metadata">
+        <source src="Video/video3.mp4" type="video/mp4">
+        您的浏览器不支持视频播放
+      </video>
+    </div>
+    <div class="video-info">
+      <div class="video-title">荷兰猪的惬意夜晚</div>
+      <div class="video-sub">
+        <span class="video-tag">文生视频</span>
+        <span class="video-tag">3D风格</span>
+        <span class="video-tag">治愈萌宠</span>
+      </div>
+      <div class="prompt-section">
+        <div class="prompt-block">
+          <div class="prompt-label"><span class="pl-tag">PROMPT</span> 视频生成提示词</div>
+          <div class="prompt-text" id="p3a">3D风格的暖光场景中，一只可爱的荷兰猪惬意地躺在床上，正津津有味地吃着火鸡面，同时还目不转睛地看着手机，生成一段视频</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Video 4 ══ -->
+  <div class="video-card">
+    <div class="video-wrap">
+      <span class="video-badge">04</span>
+      <span class="ai-badge">🤖 AI Generated</span>
+      <video controls preload="metadata">
+        <source src="Video/video4.mp4" type="video/mp4">
+        您的浏览器不支持视频播放
+      </video>
+    </div>
+    <div class="video-info">
+      <div class="video-title">赤壁夜饮·文人泛舟</div>
+      <div class="video-sub">
+        <span class="video-tag">文生视频</span>
+        <span class="video-tag">古风意境</span>
+        <span class="video-tag">电影镜头</span>
+      </div>
+      <div class="prompt-section">
+        <div class="prompt-block">
+          <div class="prompt-label"><span class="pl-tag">PROMPT</span> 视频生成提示词</div>
+          <div class="prompt-text" id="p4a">白衣文人与青衫客同舟夜饮于赤壁江上，文人举盏吟诵、衣袖临风，客人抚膝侧耳回应；江浪轻拍船身微微起伏，赤壁石影倒映水中荡漾；镜头从船舱内缓慢推出环绕至江面全景。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p class="footer-note">以上视频均由 AI 工具生成 · 仅供学习与创作展示</p>
+    <a href="index.html" class="back-btn">
+      <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
       返回小屋
     </a>
   </div>
+
+</div>
+
+<script>
+function togglePrompt(id, btn) {
+  const el = document.getElementById(id);
+  const expanded = el.classList.toggle('expanded');
+  btn.textContent = expanded ? '收起 ↑' : '展开全部 ↓';
+}
+</script>
 </body>
 </html>

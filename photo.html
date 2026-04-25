@@ -1,102 +1,498 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>摄影集 · 我的小屋</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>摄影集 · 我的小屋</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
 
-    body {
-      min-height: 100vh;
-      font-family: 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-      display: flex; align-items: center; justify-content: center;
-      background:
-        repeating-linear-gradient(94deg,
-          transparent, transparent 18px,
-          rgba(139,105,50,.04) 18px, rgba(139,105,50,.04) 19px),
-        linear-gradient(155deg, #FAF0E0 0%, #EDDFBF 45%, #DCC9A4 100%);
-    }
+:root {
+  --brown: #9E5C2C;
+  --brown2: #C8844A;
+  --brown3: #7A4020;
+  --text: #3E2208;
+  --muted: #7A5520;
+  --muted2: rgba(122,85,32,0.55);
+  --border: rgba(200,165,110,0.35);
+  --shadow: rgba(100,70,30,0.15);
+  --card: rgba(255,251,242,0.95);
+}
 
-    .card {
-      text-align: center;
-      padding: 56px 72px;
-      background: rgba(255,251,242,.9);
-      border-radius: 22px;
-      box-shadow:
-        0 2px 0 rgba(255,255,255,.8) inset,
-        0 10px 48px rgba(100,70,30,.18),
-        0 1px 4px rgba(100,70,30,.12);
-      border: 1px solid rgba(200,165,110,.38);
-      max-width: 460px; width: calc(100% - 40px);
-      animation: cardIn .6s cubic-bezier(.34,1.56,.64,1) both;
-    }
+html { scroll-behavior:smooth; }
 
-    @keyframes cardIn {
-      from { opacity: 0; transform: translateY(22px) scale(.96); }
-      to   { opacity: 1; transform: none; }
-    }
+body {
+  font-family:'PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif;
+  min-height:100vh; color:var(--text);
+  background:
+    repeating-linear-gradient(94deg,
+      transparent,transparent 18px,
+      rgba(139,105,50,.03) 18px,rgba(139,105,50,.03) 19px),
+    linear-gradient(150deg,#FBF3E2 0%,#EFE0C0 50%,#E2CFA8 100%);
+  background-attachment:fixed;
+}
 
-    .icon {
-      font-size: 62px; margin-bottom: 18px; display: block;
-      animation: iconBounce .5s ease .2s both;
-    }
+/* ── 顶部导航 ── */
+.topbar {
+  position:sticky; top:0; z-index:100;
+  background:rgba(245,236,215,0.92);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  padding:0.85rem 2rem;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.topbar-title { font-size:1.1rem; font-weight:700; color:var(--brown3); }
+.topbar-sub { font-size:0.78rem; color:var(--muted2); margin-top:2px; }
 
-    @keyframes iconBounce {
-      from { opacity: 0; transform: scale(.5) rotate(-15deg); }
-      to   { opacity: 1; transform: none; }
-    }
+.back-btn {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:0.55rem 1.3rem;
+  background:linear-gradient(135deg,var(--brown),var(--brown2));
+  color:#fff; text-decoration:none; border-radius:28px; font-size:0.85rem;
+  box-shadow:0 3px 12px rgba(158,92,44,0.3);
+  transition:all 0.25s ease;
+}
+.back-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(158,92,44,0.4); }
 
-    h1 {
-      color: #3E2208; font-size: 26px;
-      font-weight: 600; letter-spacing: 2px; margin-bottom: 6px;
-    }
+/* ── 主体 ── */
+.main { max-width:1080px; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
 
-    .divider {
-      width: 48px; height: 2px; margin: 14px auto 16px;
-      background: linear-gradient(90deg, transparent, #C8944A, transparent);
-    }
+/* ── Hero ── */
+.hero-card {
+  background:var(--card);
+  border-radius:20px; border:1px solid var(--border);
+  box-shadow:0 8px 40px var(--shadow),0 1px 0 rgba(255,255,255,.8) inset;
+  padding:2.5rem 2rem 2rem; text-align:center; margin-bottom:2rem;
+  animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes cardIn { from{opacity:0;transform:translateY(16px) scale(.97)} to{opacity:1;transform:none} }
 
-    .msg {
-      color: #7A5520; font-size: 15px; line-height: 1.9; margin-bottom: 8px;
-    }
+.hero-icon { font-size:3rem; margin-bottom:0.8rem; display:block; }
+.hero-title { font-size:1.8rem; font-weight:700; color:var(--text); margin-bottom:0.5rem; }
+.hero-divider { width:48px; height:2px; margin:0.9rem auto; background:linear-gradient(90deg,transparent,var(--brown2),transparent); }
+.hero-desc { font-size:0.95rem; color:var(--muted); line-height:1.8; }
 
-    .sub {
-      color: rgba(122,85,32,.55); font-size: 13px; margin-bottom: 36px;
-    }
+/* ── Tabs ── */
+.tabs-wrap {
+  background:var(--card); border-radius:16px;
+  border:1px solid var(--border); box-shadow:0 4px 20px var(--shadow);
+  padding:1.2rem 1.5rem; margin-bottom:1.8rem;
+  display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center;
+}
+.tabs-label { font-size:0.82rem; color:var(--muted2); margin-right:0.3rem; white-space:nowrap; }
+.tab {
+  padding:0.48rem 1.15rem; border-radius:28px;
+  border:1.5px solid var(--border); background:transparent;
+  color:var(--muted); font-size:0.88rem; cursor:pointer;
+  transition:all 0.2s ease;
+}
+.tab:hover { border-color:var(--brown2); color:var(--brown); }
+.tab.active {
+  background:linear-gradient(135deg,var(--brown),var(--brown2));
+  color:#fff; border-color:transparent;
+  box-shadow:0 3px 12px rgba(158,92,44,0.3);
+}
 
-    .back {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: linear-gradient(135deg, #9E5C2C, #C8844A);
-      color: #fff; text-decoration: none;
-      padding: 11px 28px; border-radius: 28px;
-      font-size: 14px; letter-spacing: .5px;
-      box-shadow: 0 3px 14px rgba(158,92,44,.32);
-      transition: all .28s ease;
-    }
+/* ── 分类区块 ── */
+.category { display:none; animation:fadeIn .35s ease; }
+.category.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
 
-    .back:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 22px rgba(158,92,44,.42);
-      background: linear-gradient(135deg, #884E25, #B5743B);
-    }
+.cat-block {
+  background:var(--card); border-radius:18px;
+  border:1px solid var(--border); box-shadow:0 4px 24px var(--shadow);
+  padding:1.8rem; margin-bottom:1.5rem;
+}
+.cat-header { display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem; }
+.cat-icon { font-size:1.5rem; }
+.cat-name { font-size:1.25rem; font-weight:700; color:var(--text); }
+.cat-badge {
+  margin-left:0.4rem; background:var(--brown2); color:#fff;
+  font-size:0.72rem; padding:0.18rem 0.65rem; border-radius:20px;
+}
+.cat-desc { font-size:0.88rem; color:var(--muted); line-height:1.7; margin-bottom:1.4rem; }
 
-    .back:active { transform: none; }
-  </style>
+/* ── 普通照片网格 ── */
+.grid {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:1rem;
+}
+@media(min-width:600px){ .grid{ grid-template-columns:repeat(4,1fr); } }
+
+.photo-card {
+  position:relative; overflow:hidden; border-radius:12px;
+  border:1px solid var(--border); box-shadow:0 3px 14px var(--shadow);
+  cursor:pointer; background:#f0e8d4; aspect-ratio:4/5;
+  transition:all 0.25s ease;
+}
+.photo-card:hover { transform:translateY(-4px); box-shadow:0 10px 30px rgba(100,70,30,.25); border-color:var(--brown2); }
+.photo-card img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s ease; }
+.photo-card:hover img { transform:scale(1.05); }
+
+.photo-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to top,rgba(62,34,8,.82) 0%,transparent 55%);
+  opacity:0; transition:opacity .28s;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding:0.9rem; border-radius:inherit;
+}
+.photo-card:hover .photo-overlay { opacity:1; }
+.card-tag {
+  position:absolute; top:0.6rem; left:0.6rem;
+  background:rgba(255,251,242,0.9); color:var(--brown3);
+  font-size:0.68rem; padding:0.18rem 0.55rem; border-radius:12px; font-weight:600;
+}
+.ov-title { font-size:0.88rem; font-weight:600; color:#fff; margin-bottom:0.2rem; }
+.ov-sub   { font-size:0.72rem; color:rgba(255,235,200,0.85); }
+
+/* ══ AI 分类特殊样式 ══ */
+.ai-grid {
+  display:grid; grid-template-columns:repeat(1,1fr); gap:1.4rem;
+}
+@media(min-width:500px){ .ai-grid{ grid-template-columns:repeat(2,1fr); } }
+
+.ai-card {
+  background:#fff; border-radius:14px;
+  border:1px solid var(--border); box-shadow:0 3px 16px var(--shadow);
+  overflow:hidden; transition:all 0.25s ease;
+}
+.ai-card:hover { transform:translateY(-4px); box-shadow:0 10px 30px rgba(100,70,30,.2); }
+
+.ai-img-wrap {
+  position:relative; aspect-ratio:3/4; overflow:hidden; cursor:pointer;
+}
+.ai-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .4s; }
+.ai-img-wrap:hover img { transform:scale(1.04); }
+
+.ai-badge {
+  position:absolute; top:0.7rem; left:0.7rem;
+  background:linear-gradient(135deg,#6e3bff,#c23eff);
+  color:#fff; font-size:0.65rem; padding:0.2rem 0.6rem;
+  border-radius:12px; font-weight:600; letter-spacing:0.05em;
+}
+
+.ai-info { padding:1rem 1.1rem 1.2rem; }
+.ai-title { font-size:1rem; font-weight:700; color:var(--text); margin-bottom:0.5rem; }
+
+/* 提示词区域 */
+.prompt-box {
+  background:#fdf6ee; border-radius:8px;
+  border:1px dashed rgba(200,132,74,0.4);
+  padding:0.75rem 0.9rem;
+}
+.prompt-label {
+  font-size:0.68rem; color:var(--brown2); font-weight:600;
+  letter-spacing:0.08em; margin-bottom:0.4rem;
+  display:flex; align-items:center; gap:0.3rem;
+}
+.prompt-text {
+  font-size:0.78rem; color:var(--muted); line-height:1.7;
+  max-height:4.5em; overflow:hidden;
+  position:relative; transition:max-height 0.4s ease;
+}
+.prompt-text.expanded { max-height:999px; }
+.prompt-text::after {
+  content:''; position:absolute; bottom:0; left:0; right:0;
+  height:1.5em;
+  background:linear-gradient(transparent,#fdf6ee);
+  pointer-events:none; transition:opacity .3s;
+}
+.prompt-text.expanded::after { opacity:0; }
+.prompt-toggle {
+  font-size:0.72rem; color:var(--brown); cursor:pointer;
+  margin-top:0.4rem; display:inline-block;
+  text-decoration:underline; text-underline-offset:2px;
+}
+.prompt-toggle:hover { color:var(--brown3); }
+
+/* ── 灯箱 ── */
+#lightbox {
+  position:fixed; inset:0; z-index:200;
+  background:rgba(30,15,5,.92);
+  display:none; align-items:center; justify-content:center;
+  flex-direction:column; gap:1rem; backdrop-filter:blur(10px);
+}
+#lightbox.open { display:flex; }
+#lightbox img { max-width:92vw; max-height:80vh; object-fit:contain; border-radius:8px; box-shadow:0 0 60px rgba(200,132,74,.3); }
+.lb-cap { font-size:0.95rem; color:rgba(240,220,180,.9); text-align:center; max-width:600px; padding:0 1rem; }
+.lb-close {
+  position:absolute; top:1.5rem; right:1.8rem;
+  background:rgba(255,251,242,.15); border:1px solid rgba(255,251,242,.3);
+  color:#fff; font-size:0.9rem; cursor:pointer;
+  padding:0.4rem 1rem; border-radius:20px; transition:background .2s;
+}
+.lb-close:hover { background:rgba(255,251,242,.28); }
+
+/* ── 底部 ── */
+.footer { text-align:center; margin-top:2.5rem; padding-bottom:1rem; }
+</style>
 </head>
 <body>
-  <div class="card">
-    <span class="icon">📷</span>
-    <h1>摄影集</h1>
-    <div class="divider"></div>
-    <p class="msg">用镜头定格生活的温柔瞬间<br>内容即将上线</p>
-    <p class="sub">感谢您的耐心等待 ✨</p>
-    <a class="back" href="index.html">
-      <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10 12L6 8l4-4"/>
-      </svg>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-title">📷 我的相册</div>
+    <div class="topbar-sub">旅途中的风景与瞬间</div>
+  </div>
+  <a href="index.html" class="back-btn">
+    <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
+    返回小屋
+  </a>
+</div>
+
+<div id="lightbox">
+  <div class="lb-close" onclick="closeLB()">✕ 关闭</div>
+  <img id="lb-img" src="" alt="">
+  <p class="lb-cap" id="lb-cap"></p>
+</div>
+
+<div class="main">
+
+  <div class="hero-card">
+    <span class="hero-icon">📷</span>
+    <h1 class="hero-title">旅行相册</h1>
+    <div class="hero-divider"></div>
+    <p class="hero-desc">这里收藏了我旅途中拍下的风景与片刻，也放了一些 AI 生成的画面灵感。<br>按分类浏览，点击任意照片可放大查看。</p>
+  </div>
+
+  <div class="tabs-wrap">
+    <span class="tabs-label">按地点浏览：</span>
+    <div class="tab active"  onclick="switchTab('sanya',this)">🌊 三亚</div>
+    <div class="tab" onclick="switchTab('jiuzhai',this)">🏔️ 九寨沟</div>
+    <div class="tab" onclick="switchTab('hangzhou',this)">🌸 杭州西湖</div>
+    <div class="tab" onclick="switchTab('chengdu',this)">🐼 成都</div>
+    <div class="tab" onclick="switchTab('ai',this)">🤖 AI 生成</div>
+  </div>
+
+  <!-- ══ 三亚 ══ -->
+  <div class="category active" id="cat-sanya">
+    <div class="cat-block">
+      <div class="cat-header"><span class="cat-icon">🌊</span><span class="cat-name">三亚旅行</span><span class="cat-badge">4 张照片</span></div>
+      <p class="cat-desc">蓝色海岸线、棕榈树与礁石奇景，是属于三亚的热烈与松弛感。</p>
+      <div class="grid">
+        <div class="photo-card" onclick="openLB('photos/sanya/sanya1.jpg','岩洞框景·大海奔涌 — 天涯海角')">
+          <img src="photos/sanya/sanya1.jpg" alt="岩洞框景">
+          <span class="card-tag">三亚</span>
+          <div class="photo-overlay"><div class="ov-title">岩洞框景·大海奔涌</div><div class="ov-sub">📍 天涯海角</div></div>
+        </div>
+        <div class="photo-card" onclick="openLB('photos/sanya/sanya2.jpg','天涯公路·通向碧海 — 环岛旅游公路')">
+          <img src="photos/sanya/sanya2.jpg" alt="天涯公路">
+          <span class="card-tag">三亚</span>
+          <div class="photo-overlay"><div class="ov-title">天涯公路·通向碧海</div><div class="ov-sub">📍 环岛旅游公路</div></div>
+        </div>
+        <div class="photo-card" onclick="openLB('photos/sanya/sanya3.jpg','南海之门·巴厘风情 — 蜈支洲岛')">
+          <img src="photos/sanya/sanya3.jpg" alt="南海之门">
+          <span class="card-tag">三亚</span>
+          <div class="photo-overlay"><div class="ov-title">南海之门·巴厘风情</div><div class="ov-sub">📍 蜈支洲岛</div></div>
+        </div>
+        <div class="photo-card" onclick="openLB('photos/sanya/sanya4.jpg','三亚湾·金沙与晴空 — 三亚湾海滩')">
+          <img src="photos/sanya/sanya4.jpg" alt="三亚湾">
+          <span class="card-tag">三亚</span>
+          <div class="photo-overlay"><div class="ov-title">三亚湾·金沙与晴空</div><div class="ov-sub">📍 三亚湾海滩</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 九寨沟 ══ -->
+  <div class="category" id="cat-jiuzhai">
+    <div class="cat-block">
+      <div class="cat-header"><span class="cat-icon">🏔️</span><span class="cat-name">九寨沟</span><span class="cat-badge">4 张照片</span></div>
+      <p class="cat-desc">五彩池、珍珠滩瀑布，用镜头留住那些不真实的蓝绿色。</p>
+      <div class="grid">
+        <div class="photo-card" onclick="openLB('photos/jiuzhai/jiuzhai1.jpg','碧湖倒影·青山入镜 — 九寨沟')">
+          <img src="photos/jiuzhai/jiuzhai1.jpg" alt="碧湖倒影">
+          <span class="card-tag">九寨沟</span>
+          <div class="photo-overlay"><div class="ov-title">碧湖倒影·青山入镜</div><div class="ov-sub">📍 九寨沟</div></div>
+        </div>
+        <div class="photo-card" onclick="openLB('photos/jiuzhai/jiuzhai2.jpg','镜海·山影云动 — 九寨沟')">
+          <img src="photos/jiuzhai/jiuzhai2.jpg" alt="镜海">
+          <span class="card-tag">九寨沟</span>
+          <div class="photo-overlay"><div class="ov-title">镜海·山影云动</div><div class="ov-sub">📍 九寨沟</div></div>
+        </div>
+        <div class="photo-card" onclick="openLB('photos/jiuzhai/jiuzhai3.jpg','林间秘境·翡翠溪流 — 九寨沟')">
+          <img src="photos/jiuzhai/jiuzhai3.jpg" alt="翡翠溪流">
+          <span class="card-tag">九寨沟</span>
+          <div class="photo-overlay"><div class="ov-title">林间秘境·翡翠溪流</div><div class="ov-sub">📍 九寨沟</div></div>
+        </div>
+        <div class="photo-card" onclick="openLB('photos/jiuzhai/jiuzhai4.jpg','栈道人流·晨光芦海 — 九寨沟')">
+          <img src="photos/jiuzhai/jiuzhai4.jpg" alt="栈道芦海">
+          <span class="card-tag">九寨沟</span>
+          <div class="photo-overlay"><div class="ov-title">栈道人流·晨光芦海</div><div class="ov-sub">📍 九寨沟</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 杭州西湖 ══ -->
+  <div class="category" id="cat-hangzhou">
+    <div class="cat-block">
+      <div class="cat-header"><span class="cat-icon">🌸</span><span class="cat-name">杭州西湖</span><span class="cat-badge">4 张照片</span></div>
+      <p class="cat-desc">断桥残雪、曲院风荷，西湖四季各有各的温柔。</p>
+      <div class="grid">
+        <div class="photo-card" onclick="openLB('photos/hangzhou/hangzhou1.jpg','梦溪夜樱·古亭灯影 — 中国院子梦溪苑')">
+          <img src="photos/hangzhou/hangzhou1.jpg" alt="梦溪夜樱">
+          <span class="card-tag">西湖</span>
+          <div class="photo-overlay"><div class="ov-title">梦溪夜樱·古亭灯影</div><div class="ov-sub">📍 中国院子·梦溪苑</div></div>
+        </div>
+        <div class="photo-card" onclick="openLB('photos/hangzhou/hangzhou2.jpg','烟雨雷峰·一塔千年 — 杭州西湖')">
+          <img src="photos/hangzhou/hangzhou2.jpg" alt="雷峰塔">
+          <span class="card-tag">西湖</span>
+          <div class="photo-overlay"><div class="ov-title">烟雨雷峰·一塔千年</div><div class="ov-sub">📍 杭州·雷峰塔</div></div>
+        </div>
+        <div class="photo-card" onclick="openLB('photos/hangzhou/hangzhou3.jpg','我心相印亭·圆框观湖 — 西湖三潭映月')">
+          <img src="photos/hangzhou/hangzhou3.jpg" alt="我心相印亭">
+          <span class="card-tag">西湖</span>
+          <div class="photo-overlay"><div class="ov-title">我心相印亭·圆框观湖</div><div class="ov-sub">📍 西湖·三潭映月</div></div>
+        </div>
+        <div class="photo-card" onclick="openLB('photos/hangzhou/hangzhou4.jpg','湖畔树影·碎光摇曳 — 杭州西湖')">
+          <img src="photos/hangzhou/hangzhou4.jpg" alt="湖畔树影">
+          <span class="card-tag">西湖</span>
+          <div class="photo-overlay"><div class="ov-title">湖畔树影·碎光摇曳</div><div class="ov-sub">📍 杭州·西湖湖畔</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 成都 ══ -->
+  <div class="category" id="cat-chengdu">
+    <div class="cat-block">
+      <div class="cat-header"><span class="cat-icon">🐼</span><span class="cat-name">成都记忆</span><span class="cat-badge">4 张照片</span></div>
+      <p class="cat-desc">从自然奇景到千年遗址，成都藏着太多让人意想不到的惊喜。</p>
+      <div class="grid">
+        <div class="photo-card" onclick="openLB('photos/chengdu/chengdu1.jpg','黄龙五彩池·人间调色盘 — 黄龙景区')">
+          <img src="photos/chengdu/chengdu1.jpg" alt="黄龙五彩池">
+          <span class="card-tag">成都</span>
+          <div class="photo-overlay"><div class="ov-title">黄龙五彩池·人间调色盘</div><div class="ov-sub">📍 黄龙景区</div></div>
+        </div>
+        <div class="photo-card" onclick="openLB('photos/chengdu/chengdu2.jpg','都江堰·碧水分流千年 — 都江堰景区')">
+          <img src="photos/chengdu/chengdu2.jpg" alt="都江堰俯瞰">
+          <span class="card-tag">成都</span>
+          <div class="photo-overlay"><div class="ov-title">都江堰·碧水分流千年</div><div class="ov-sub">📍 都江堰景区</div></div>
+        </div>
+        <div class="photo-card" onclick="openLB('photos/chengdu/chengdu3.jpg','都江堰夜色·霓虹逐浪 — 都江堰')">
+          <img src="photos/chengdu/chengdu3.jpg" alt="都江堰夜景">
+          <span class="card-tag">成都</span>
+          <div class="photo-overlay"><div class="ov-title">都江堰夜色·霓虹逐浪</div><div class="ov-sub">📍 都江堰夜景</div></div>
+        </div>
+        <div class="photo-card" onclick="openLB('photos/chengdu/chengdu4.jpg','三星堆·萌猪望千年 — 三星堆博物馆')">
+          <img src="photos/chengdu/chengdu4.jpg" alt="三星堆陶猪">
+          <span class="card-tag">成都</span>
+          <div class="photo-overlay"><div class="ov-title">三星堆·萌猪望千年</div><div class="ov-sub">📍 三星堆博物馆</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ AI 生成 ══ -->
+  <div class="category" id="cat-ai">
+    <div class="cat-block">
+      <div class="cat-header"><span class="cat-icon">🤖</span><span class="cat-name">AI 生成照片</span><span class="cat-badge">4 张</span></div>
+      <p class="cat-desc">用提示词召唤出的画面灵感，每一张都附有生成时使用的完整提示词。</p>
+
+      <div class="ai-grid">
+
+        <!-- AI 1 -->
+        <div class="ai-card">
+          <div class="ai-img-wrap" onclick="openLB('photos/ai/ai1.jpg','夕阳侠客·芦苇荡中')">
+            <img src="photos/ai/ai1.jpg" alt="夕阳侠客">
+            <span class="ai-badge">🤖 AI Generated</span>
+          </div>
+          <div class="ai-info">
+            <div class="ai-title">夕阳侠客·芦苇荡中</div>
+            <div class="prompt-box">
+              <div class="prompt-label">✦ Prompt 提示词</div>
+              <div class="prompt-text" id="pt1">黄昏，红日高挂，芦苇荡，地平线上有一位长发侠客剪影，头戴斗笠，手拿长剑指向镜头，色彩鲜艳明亮，高饱和度，插画艺术，数字CG艺术，oc渲染器，发光特效，真实光线追踪，真实光线反射，真实光线衰减，正面视角</div>
+              <span class="prompt-toggle" onclick="togglePrompt('pt1',this)">展开全部 ↓</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI 2 -->
+        <div class="ai-card">
+          <div class="ai-img-wrap" onclick="openLB('photos/ai/ai2.jpg','花径小屋·山间田园')">
+            <img src="photos/ai/ai2.jpg" alt="山间田园">
+            <span class="ai-badge">🤖 AI Generated</span>
+          </div>
+          <div class="ai-info">
+            <div class="ai-title">花径小屋·山间田园</div>
+            <div class="prompt-box">
+              <div class="prompt-label">✦ Prompt 提示词</div>
+              <div class="prompt-text" id="pt2">童话风山间田园风光，带积水反光的石板路小径，路两旁开满橙紫色野花，左侧有橙色花树和木栅栏，中景是木质茅草屋，背景是连绵的青山和层叠山峰，清晨/黄昏的柔和侧逆光，阳光透过山谷洒下暖金色丁达尔光，明亮温暖的治愈氛围，清新马卡龙色调，竖版9:16构图，宫崎骏动画质感，4K高清，细节丰富</div>
+              <span class="prompt-toggle" onclick="togglePrompt('pt2',this)">展开全部 ↓</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI 3 -->
+        <div class="ai-card">
+          <div class="ai-img-wrap" onclick="openLB('photos/ai/ai3.jpg','古风庭院·花瓣飘落')">
+            <img src="photos/ai/ai3.jpg" alt="古风庭院">
+            <span class="ai-badge">🤖 AI Generated</span>
+          </div>
+          <div class="ai-info">
+            <div class="ai-title">古风庭院·花瓣飘落</div>
+            <div class="prompt-box">
+              <div class="prompt-label">✦ Prompt 提示词</div>
+              <div class="prompt-text" id="pt3">国风动漫，柔软流畅，超高细节，采用细腻写实的古风手绘风格绘制，画面中呈现出一处古风内宅场景，四周绿意盎然，处处弥漫着春意盎然的气息。庭院中落花随风飘落，阳光透过窗户轻柔地洒入室内，白色的纱幔在春风的吹拂下微微飘动。整体画面运用意识流的表现手法，通过巧妙的笔触勾勒出丰富的细节，光影氛围感十足，色彩饱满丰富且细腻，融入发光美学元素，营造出一种极其唯美的意境，以高清细节和高分辨率展现出画面的精致。比例 9:16</div>
+              <span class="prompt-toggle" onclick="togglePrompt('pt3',this)">展开全部 ↓</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI 4 -->
+        <div class="ai-card">
+          <div class="ai-img-wrap" onclick="openLB('photos/ai/ai4.jpg','上班摸鱼的兔子程序员')">
+            <img src="photos/ai/ai4.jpg" alt="兔子程序员">
+            <span class="ai-badge">🤖 AI Generated</span>
+          </div>
+          <div class="ai-info">
+            <div class="ai-title">上班摸鱼的兔子程序员</div>
+            <div class="prompt-box">
+              <div class="prompt-label">✦ Prompt 提示词</div>
+              <div class="prompt-text" id="pt4">一只拟人化的小兔，以日常快照的视觉风格展现，照片中没有明确的主体或构图感，还带有轻微的运动模糊。主角占据画面中心位置，是自拍的大头照，脸上带着厌世的神情，它脖子上挂着一个带有自己大头照的工牌。背景是办公场景，旁边的电脑屏幕上是代码开发的页面，营造出一种平凡又独特的氛围。它又有对新年开工的厌烦与无奈</div>
+              <span class="prompt-toggle" onclick="togglePrompt('pt4',this)">展开全部 ↓</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <a href="index.html" class="back-btn">
+      <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
       返回小屋
     </a>
   </div>
+
+</div>
+
+<script>
+function switchTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.category').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('cat-'+name).classList.add('active');
+}
+
+function openLB(src,cap){
+  document.getElementById('lb-img').src=src;
+  document.getElementById('lb-cap').textContent=cap;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLB(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lb-img').src='';
+}
+document.getElementById('lightbox').addEventListener('click',function(e){ if(e.target===this)closeLB(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape')closeLB(); });
+
+function togglePrompt(id,btn){
+  const el=document.getElementById(id);
+  const expanded=el.classList.toggle('expanded');
+  btn.textContent=expanded?'收起 ↑':'展开全部 ↓';
+}
+</script>
 </body>
 </html>

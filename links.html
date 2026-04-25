@@ -3,100 +3,224 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>我的主页 · 我的小屋</title>
+  <title>我的作品 · 我的小屋</title>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       min-height: 100vh;
-      font-family: 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-      display: flex; align-items: center; justify-content: center;
+      font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
       background:
-        repeating-linear-gradient(94deg,
-          transparent, transparent 18px,
-          rgba(139,105,50,.04) 18px, rgba(139,105,50,.04) 19px),
+        repeating-linear-gradient(94deg, transparent, transparent 18px, rgba(139,105,50,.04) 18px, rgba(139,105,50,.04) 19px),
         linear-gradient(155deg, #FAF0E0 0%, #EDDFBF 45%, #DCC9A4 100%);
+      padding: 48px 20px 64px;
     }
 
-    .card {
-      text-align: center;
-      padding: 56px 72px;
-      background: rgba(255,251,242,.9);
-      border-radius: 22px;
-      box-shadow:
-        0 2px 0 rgba(255,255,255,.8) inset,
-        0 10px 48px rgba(100,70,30,.18),
-        0 1px 4px rgba(100,70,30,.12);
-      border: 1px solid rgba(200,165,110,.38);
-      max-width: 460px; width: calc(100% - 40px);
-      animation: cardIn .6s cubic-bezier(.34,1.56,.64,1) both;
+    .page { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(20px) scale(.97); }
+      to   { opacity:1; transform:none; }
     }
 
-    @keyframes cardIn {
-      from { opacity: 0; transform: translateY(22px) scale(.96); }
-      to   { opacity: 1; transform: none; }
+    .header-card {
+      text-align: center; padding: 44px 48px;
+      background: rgba(255,251,242,.95);
+      border-radius: 24px; border: 1px solid rgba(200,165,110,.35);
+      box-shadow: 0 2px 0 rgba(255,255,255,.8) inset, 0 10px 40px rgba(100,70,30,.15);
+      animation: fadeUp .6s cubic-bezier(.34,1.4,.64,1) both;
     }
 
-    .icon {
-      font-size: 62px; margin-bottom: 18px; display: block;
-      animation: iconBounce .5s ease .2s both;
-    }
-
-    @keyframes iconBounce {
-      from { opacity: 0; transform: scale(.5) rotate(-15deg); }
-      to   { opacity: 1; transform: none; }
-    }
-
-    h1 {
-      color: #3E2208; font-size: 26px;
-      font-weight: 600; letter-spacing: 2px; margin-bottom: 6px;
-    }
+    .header-icon { font-size: 56px; margin-bottom: 14px; display: block; }
+    h1 { color: #3E2208; font-size: 26px; font-weight: 600; letter-spacing: 2px; margin-bottom: 6px; }
 
     .divider {
       width: 48px; height: 2px; margin: 14px auto 16px;
       background: linear-gradient(90deg, transparent, #C8944A, transparent);
     }
 
-    .msg {
-      color: #7A5520; font-size: 15px; line-height: 1.9; margin-bottom: 8px;
-    }
-
-    .sub {
-      color: rgba(122,85,32,.55); font-size: 13px; margin-bottom: 36px;
-    }
+    .header-desc { color: rgba(122,85,32,.7); font-size: 14px; line-height: 1.8; margin-bottom: 28px; }
 
     .back {
-      display: inline-flex; align-items: center; gap: 7px;
+      display: inline-flex; align-items: center; gap: 6px;
       background: linear-gradient(135deg, #9E5C2C, #C8844A);
       color: #fff; text-decoration: none;
-      padding: 11px 28px; border-radius: 28px;
-      font-size: 14px; letter-spacing: .5px;
-      box-shadow: 0 3px 14px rgba(158,92,44,.32);
-      transition: all .28s ease;
+      padding: 10px 24px; border-radius: 24px; font-size: 13px;
+      box-shadow: 0 3px 12px rgba(158,92,44,.28);
+      transition: all .25s ease;
+    }
+    .back:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(158,92,44,.38); }
+
+    .works-card {
+      background: rgba(255,251,242,.95);
+      border-radius: 24px; padding: 36px 40px 44px;
+      border: 1px solid rgba(200,165,110,.35);
+      box-shadow: 0 2px 0 rgba(255,255,255,.8) inset, 0 10px 40px rgba(100,70,30,.12);
+      animation: fadeUp .6s cubic-bezier(.34,1.4,.64,1) .1s both;
     }
 
-    .back:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 22px rgba(158,92,44,.42);
-      background: linear-gradient(135deg, #884E25, #B5743B);
+    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+    .section-title { color: #3E2208; font-size: 17px; font-weight: 600; letter-spacing: 1.5px; }
+    .section-badge {
+      font-size: 11px; background: linear-gradient(135deg, #9E5C2C, #C8844A);
+      color: #fff; padding: 3px 10px; border-radius: 20px; letter-spacing: .5px;
     }
 
-    .back:active { transform: none; }
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .model-card {
+      background: rgba(250,244,230,.8);
+      border: 1px solid rgba(200,165,110,.28);
+      border-radius: 18px; overflow: hidden;
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+    .model-card:hover { transform: translateY(-5px); box-shadow: 0 14px 36px rgba(100,70,30,.18); }
+
+    .model-placeholder {
+      width: 100%; height: 230px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px;
+      cursor: pointer; background: rgba(200,148,74,.06);
+      transition: background .2s ease; user-select: none;
+    }
+    .model-placeholder:hover { background: rgba(200,148,74,.14); }
+    .placeholder-icon { font-size: 40px; opacity: .55; }
+    .placeholder-text { color: rgba(122,85,32,.5); font-size: 12px; letter-spacing: .5px; }
+    .placeholder-hint { color: rgba(200,148,74,.7); font-size: 11px; }
+
+    model-viewer {
+      width: 100%; height: 230px;
+      background: transparent;
+      --progress-bar-color: #C8844A;
+    }
+
+    .model-info {
+      padding: 11px 15px 15px;
+      border-top: 1px solid rgba(200,165,110,.18);
+    }
+    .model-name { color: #3E2208; font-size: 13px; font-weight: 600; }
+
+    .tip {
+      margin-top: 22px; padding: 14px 18px;
+      background: rgba(200,148,74,.07);
+      border: 1px dashed rgba(200,148,74,.4);
+      border-radius: 10px;
+      color: rgba(122,85,32,.65); font-size: 12px; line-height: 1.9;
+    }
+    .tip code {
+      background: rgba(200,148,74,.15); padding: 1px 6px;
+      border-radius: 4px; font-family: monospace; font-size: 11px; color: #7A5520;
+    }
+
+    @media (max-width: 600px) {
+      .header-card { padding: 32px 24px; }
+      .works-card  { padding: 28px 20px 36px; }
+      .models-grid { grid-template-columns: 1fr 1fr; }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <span class="icon">🔗</span>
-    <h1>我的主页</h1>
+<div class="page">
+
+  <div class="header-card">
+    <span class="header-icon">🎨</span>
+    <h1>我的作品</h1>
     <div class="divider"></div>
-    <p class="msg">更多精彩内容正在汇聚<br>内容即将上线</p>
-    <p class="sub">感谢您的耐心等待 ✨</p>
+    <p class="header-desc">这里展示了我创作的 3D 模型作品<br>点击卡片可以旋转查看每个模型 ✨</p>
     <a class="back" href="index.html">
-      <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10 12L6 8l4-4"/>
-      </svg>
+      <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
       返回小屋
     </a>
   </div>
+
+  <div class="works-card">
+    <div class="section-header">
+      <span style="font-size:20px">🧊</span>
+      <span class="section-title">3D 模型集</span>
+      <span class="section-badge">点击加载 · 可旋转</span>
+    </div>
+
+    <div class="models-grid">
+
+      <!-- 模型1：洛克王国角色 -->
+      <div class="model-card" data-src="models/character1-v1.glb" data-name="洛克王国角色">
+        <div class="model-placeholder">
+          <div class="placeholder-icon">🐾</div>
+          <div class="placeholder-text">洛克王国角色</div>
+          <div class="placeholder-hint">▶ 点击加载</div>
+        </div>
+        <div class="model-info">
+          <div class="model-name">洛克王国角色</div>
+        </div>
+      </div>
+
+      <!-- 模型3：魔法师 -->
+      <div class="model-card" data-src="models/character2-v1.glb" data-name="魔法师">
+        <div class="model-placeholder">
+          <div class="placeholder-icon">🧙‍♂️</div>
+          <div class="placeholder-text">魔法师</div>
+          <div class="placeholder-hint">▶ 点击加载</div>
+        </div>
+        <div class="model-info">
+          <div class="model-name">魔法师</div>
+        </div>
+      </div>
+
+      <!-- 模型4：小屋 一 -->
+      <div class="model-card" data-src="models/room1-v1.glb" data-name="小屋 一">
+        <div class="model-placeholder">
+          <div class="placeholder-icon">🏠</div>
+          <div class="placeholder-text">小屋 一</div>
+          <div class="placeholder-hint">▶ 点击加载</div>
+        </div>
+        <div class="model-info">
+          <div class="model-name">小屋 一</div>
+        </div>
+      </div>
+
+      <!-- 模型5：小屋 二 -->
+      <div class="model-card" data-src="models/room2-v1.glb" data-name="小屋 二">
+        <div class="model-placeholder">
+          <div class="placeholder-icon">🏡</div>
+          <div class="placeholder-text">小屋 二</div>
+          <div class="placeholder-hint">▶ 点击加载</div>
+        </div>
+        <div class="model-info">
+          <div class="model-name">小屋 二</div>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.model-card').forEach(card => {
+    const placeholder = card.querySelector('.model-placeholder');
+    if (!placeholder) return;
+    placeholder.addEventListener('click', () => {
+      const src = card.dataset.src;
+      if (!src) return;
+      const mv = document.createElement('model-viewer');
+      mv.setAttribute('src', src);
+      mv.setAttribute('alt', card.dataset.name || '3D模型');
+      mv.setAttribute('auto-rotate', '');
+      mv.setAttribute('camera-controls', '');
+      mv.setAttribute('shadow-intensity', '1');
+      mv.setAttribute('exposure', '1.1');
+      mv.style.cssText = 'width:100%;height:230px;background:transparent;';
+      mv.style.setProperty('--progress-bar-color', '#C8844A');
+      placeholder.replaceWith(mv);
+    });
+  });
+</script>
 </body>
 </html>
