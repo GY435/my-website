@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI竞品分析 · 我的笔记</title>
+<style>
+:root{
+  --p:#534AB7;--pl:#EEEDFE;--pm:#7F77DD;
+  --t:#1D9E75;--tl:#E1F5EE;--tm:#5DCAA5;
+  --a:#BA7517;--al:#FAEEDA;--am:#EF9F27;
+  --c:#993C1D;--cl:#FAECE7;--cm:#D85A30;
+  --b:#185FA5;--bl:#E6F1FB;--bm:#378ADD;
+  --g:#5F5E5A;--gl:#F1EFE8;--gm:#888780;
+  --text:#2C2C2A;--text2:#5F5E5A;--text3:#888780;
+  --bg:#fff;--bg2:#F1EFE8;--bd:rgba(44,44,42,0.15);
+  --r:10px;--rl:16px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --text:#e8e6de;--text2:#b4b2a9;--text3:#888780;
+  --bg:#1e1e1c;--bg2:#2c2c2a;--bd:rgba(255,255,255,0.12);
+  --p:#AFA9EC;--pl:#26215C;--pm:#7F77DD;
+  --t:#5DCAA5;--tl:#04342C;--tm:#1D9E75;
+  --a:#EF9F27;--al:#412402;--am:#BA7517;
+  --c:#F0997B;--cl:#4A1B0C;--cm:#D85A30;
+  --b:#85B7EB;--bl:#042C53;--bm:#378ADD;
+  --g:#B4B2A9;--gl:#2C2C2A;--gm:#5F5E5A;
+}}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.65;}
+.page{max-width:880px;margin:0 auto;padding:24px 16px 70px;}
+h1{font-size:22px;font-weight:500;margin-bottom:4px;}
+h2{font-size:17px;font-weight:500;margin:26px 0 10px;}
+h3{font-size:14px;font-weight:500;margin:14px 0 7px;}
+p.sub{font-size:13px;color:var(--text3);margin-bottom:20px;}
+
+/* ── NAV ── */
+.topnav{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+.session-tag{font-size:11px;padding:3px 9px;border-radius:10px;font-weight:500;}
+.am-tag{background:var(--bl);color:var(--b);}
+.pm-tag{background:var(--tl);color:var(--t);}
+.nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:24px;border-bottom:0.5px solid var(--bd);padding-bottom:12px;}
+.nav button{border:0.5px solid var(--bd);background:transparent;color:var(--text2);border-radius:20px;padding:5px 13px;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.nav button:hover{background:var(--bg2);}
+.nav button.active{background:var(--pl);border-color:var(--pm);color:var(--p);font-weight:500;}
+.sec{display:none;}.sec.active{display:block;}
+.sec-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:8px;font-weight:500;vertical-align:middle;margin-left:4px;}
+
+/* ── BASE ── */
+.card{background:var(--bg2);border-radius:var(--r);padding:14px;margin-bottom:10px;border:0.5px solid var(--bd);}
+.ct{font-size:11px;font-weight:500;color:var(--text3);margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--bg2);padding:8px 10px;text-align:left;font-weight:500;color:var(--text2);border-bottom:0.5px solid var(--bd);}
+td{padding:8px 10px;border-bottom:0.5px solid var(--bd);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500;}
+.bp{background:var(--pl);color:var(--p);}
+.bt{background:var(--tl);color:var(--t);}
+.ba{background:var(--al);color:var(--a);}
+.bc{background:var(--cl);color:var(--c);}
+.bb{background:var(--bl);color:var(--b);}
+.bg_{background:var(--gl);color:var(--g);}
+.tag{display:inline-block;background:var(--bg2);border:0.5px solid var(--bd);border-radius:6px;padding:2px 7px;font-size:12px;color:var(--text2);margin:2px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+@media(max-width:580px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+/* ── HIGHLIGHT ── */
+.hl{border-left:3px solid var(--p);background:var(--pl);border-radius:0 var(--r) var(--r) 0;padding:10px 14px;margin:10px 0;font-size:13px;}
+.hl-t{border-color:var(--t);background:var(--tl);}
+.hl-a{border-color:var(--a);background:var(--al);}
+.hl-c{border-color:var(--c);background:var(--cl);}
+.hl-b{border-color:var(--b);background:var(--bl);}
+.quote{border-left:3px solid var(--a);background:var(--al);border-radius:0 var(--r) var(--r) 0;padding:9px 14px;margin:8px 0;font-size:13px;color:var(--text2);font-style:italic;}
+
+/* ── STEPS ── */
+.step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.snum{min-width:26px;height:26px;border-radius:50%;background:var(--pl);color:var(--p);font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.stit{font-weight:500;font-size:13px;}
+.sdesc{font-size:12px;color:var(--text2);margin-top:2px;}
+
+/* ── FLOW BAR ── */
+.flow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:12px 0;}
+.fstep{border-radius:8px;padding:7px 11px;font-size:12px;font-weight:500;}
+.farr{color:var(--text3);font-size:11px;}
+
+/* ── AGI LEVELS ── */
+.agi-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--r);margin-bottom:7px;border:0.5px solid var(--bd);cursor:pointer;transition:all .2s;}
+.agi-row:hover{transform:translateX(3px);}
+.agi-dot{min-width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#fff;}
+.agi-info{flex:1;}
+.agi-title{font-weight:500;font-size:13px;}
+.agi-sub{font-size:12px;color:var(--text2);}
+.agi-extra{display:none;margin-top:8px;font-size:12px;color:var(--text2);}
+.agi-st{font-size:11px;padding:2px 8px;border-radius:10px;}
+
+/* ── LAYERS ── */
+.layer-bar{display:flex;flex-direction:column;gap:4px;}
+.layer{border-radius:8px;padding:10px 14px;}
+.ll{font-size:11px;font-weight:500;letter-spacing:.4px;opacity:.7;margin-bottom:3px;}
+.lt{font-size:13px;font-weight:500;}
+.ly1{background:var(--tl);border:0.5px solid var(--tm);}
+.ly2{background:var(--pl);border:0.5px solid var(--pm);}
+.ly3{background:var(--al);border:0.5px solid var(--am);}
+.ly4{background:var(--gl);border:0.5px solid var(--gm);}
+.ly1 .ll,.ly1 .lt{color:var(--t);}
+.ly2 .ll,.ly2 .lt{color:var(--p);}
+.ly3 .ll,.ly3 .lt{color:var(--a);}
+.ly4 .ll,.ly4 .lt{color:var(--g);}
+
+/* ── ACCORDION DIM ── */
+.acc{border-radius:var(--r);border:0.5px solid var(--bd);overflow:hidden;margin-bottom:8px;}
+.acc-hd{padding:10px 14px;font-weight:500;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;}
+.acc-bd{padding:12px 14px;border-top:0.5px solid var(--bd);display:none;}
+.acc-bd.open{display:block;}
+.acc-ic{font-size:11px;color:var(--text3);transition:transform .2s;}
+.acc-ic.open{transform:rotate(90deg);}
+
+/* ── COMPETITOR TYPES ── */
+.ctype{border-radius:var(--r);padding:12px 14px;margin-bottom:8px;}
+.ct1{background:var(--cl);border:0.5px solid var(--cm);}
+.ct2{background:var(--al);border:0.5px solid var(--am);}
+.ct3{background:var(--bl);border:0.5px solid var(--bm);}
+.ct1-tit{color:var(--c);font-weight:500;font-size:13px;margin-bottom:4px;}
+.ct2-tit{color:var(--a);font-weight:500;font-size:13px;margin-bottom:4px;}
+.ct3-tit{color:var(--b);font-weight:500;font-size:13px;margin-bottom:4px;}
+
+/* ── VS BOX ── */
+.vs{display:grid;grid-template-columns:1fr auto 1fr;border-radius:var(--rl);overflow:hidden;border:0.5px solid var(--bd);margin:12px 0;}
+.vs-l{background:var(--gl);padding:14px;}
+.vs-m{background:var(--bg2);display:flex;align-items:center;justify-content:center;padding:8px 7px;font-size:11px;font-weight:500;color:var(--text3);writing-mode:vertical-rl;border-left:0.5px solid var(--bd);border-right:0.5px solid var(--bd);}
+.vs-r{background:var(--tl);padding:14px;}
+.vs-tit{font-weight:500;font-size:13px;margin-bottom:7px;}
+.vs-l .vs-tit{color:var(--g);}
+.vs-r .vs-tit{color:var(--t);}
+.vs-li{font-size:12px;color:var(--text2);margin-bottom:4px;padding-left:10px;position:relative;}
+.vs-li::before{content:"•";position:absolute;left:0;}
+
+/* ── SWOT ── */
+.swot{display:grid;grid-template-columns:1fr 1fr;border-radius:var(--rl);overflow:hidden;border:0.5px solid var(--bd);margin:12px 0;}
+.sw{padding:14px;}
+.sw-s{background:var(--tl);}
+.sw-w{background:var(--cl);}
+.sw-o{background:var(--bl);}
+.sw-t{background:var(--al);}
+.sw-big{font-size:20px;font-weight:500;margin-bottom:3px;}
+.sw-s .sw-big{color:var(--t);}
+.sw-w .sw-big{color:var(--c);}
+.sw-o .sw-big{color:var(--b);}
+.sw-t .sw-big{color:var(--a);}
+.sw-nm{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px;}
+.sw-desc{font-size:12px;color:var(--text2);}
+
+/* ── DEEP RESEARCH FLOW ── */
+.dr-flow{display:flex;flex-direction:column;gap:5px;margin:10px 0;}
+.dr-step{border-radius:8px;padding:8px 12px;font-size:12px;display:flex;align-items:center;gap:8px;}
+.dr-n{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#fff;flex-shrink:0;}
+.dr-arr{text-align:center;color:var(--text3);font-size:10px;}
+
+/* ── MODEL SELECTOR ── */
+.ms-row{background:var(--bg2);border-radius:var(--r);border:0.5px solid var(--bd);padding:12px 14px;margin-bottom:8px;}
+.ms-label{font-size:12px;color:var(--text3);margin-bottom:7px;font-weight:500;}
+.ms-opts{display:flex;gap:6px;flex-wrap:wrap;}
+.ms-opt{border:0.5px solid var(--bd);border-radius:6px;padding:4px 9px;font-size:12px;cursor:pointer;transition:all .15s;}
+.ms-opt:hover{background:var(--bg2);}
+.ms-opt.sel{border-color:var(--pm);background:var(--pl);color:var(--p);font-weight:500;}
+.ms-hint{font-size:11px;color:var(--text3);margin-top:6px;}
+
+/* ── QA CARDS ── */
+.qa{background:var(--bg2);border-radius:var(--r);border:0.5px solid var(--bd);padding:13px;margin-bottom:7px;}
+.qa-q{font-weight:500;font-size:13px;color:var(--p);cursor:pointer;user-select:none;}
+.qa-a{font-size:13px;color:var(--text2);margin-top:8px;display:none;padding-top:8px;border-top:0.5px solid var(--bd);line-height:1.7;}
+.qa-a.show{display:block;}
+
+/* ── TOOL CARD ── */
+.tool{border-radius:var(--r);border:0.5px solid var(--bd);padding:12px 14px;margin-bottom:7px;display:flex;gap:12px;}
+.tool-ic{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.tool-nm{font-weight:500;font-size:13px;}
+.tool-desc{font-size:12px;color:var(--text2);margin-top:2px;}
+.ptag{font-size:11px;padding:2px 6px;border-radius:6px;}
+.pfree{background:var(--tl);color:var(--t);}
+.ppaid{background:var(--al);color:var(--a);}
+
+/* ── SECTION DIVIDER ── */
+.sdiv{display:flex;align-items:center;gap:10px;margin:22px 0 14px;color:var(--text3);font-size:12px;}
+.sdiv::before,.sdiv::after{content:"";flex:1;height:0.5px;background:var(--bd);}
+</style>
+</head>
+<body>
+<div style="max-width:880px;margin:0 auto;padding:16px 16px 0;">
+  <a href="notes.html" style="display:inline-flex;align-items:center;gap:6px;color:#534AB7;font-size:13px;text-decoration:none;opacity:.7;transition:opacity .2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">
+    <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
+    返回笔记列表
+  </a>
+</div>
+<div class="page">
+
+<h1>🧠 AI竞品分析 · 完整笔记</h1>
+<p class="sub">点击标签切换章节</p>
+
+<div class="nav">
+  <button class="active" onclick="sw('overview')">📌 概念总览</button>
+  <button onclick="sw('agi')">🚀 AGI五阶段</button>
+  <button onclick="sw('arch')">🏗️ 产品架构</button>
+  <button onclick="sw('comp')">⚔️ 竞品分类</button>
+  <button onclick="sw('flow')">📋 分析流程</button>
+  <button onclick="sw('dims')">🔍 四大维度</button>
+  <button onclick="sw('deep')">🔬 Deep Research</button>
+  <button onclick="sw('model')">⚙️ 模型选型</button>
+  <button onclick="sw('report')">📝 报告&工具</button>
+  <button onclick="sw('review')">💡 知识速查</button>
+</div>
+
+<!-- ═══════════════════════════════════════ 1. 概念总览 ═══ -->
+<div id="tab-overview" class="sec active">
+  <h2>什么是AI竞品分析？</h2>
+  <div class="hl">
+    在AI产品领域，竞品分析是一种<strong>系统性拆解</strong>竞争对手在<strong>用户层、技术层、模型层与基础设施层</strong>上综合表现的分析过程。<br>
+    不仅是静态的功能对比，更是通过对技术能力、用户体验的对照评测，理解AI产品核心竞争壁垒的关键手段。
+  </div>
+
+  <h2>为什么要做竞品分析？</h2>
+  <div class="grid2">
+    <div class="card">
+      <div class="ct">核心目的</div>
+      <div class="step"><div class="snum">①</div><div><div class="stit">了解市场格局</div><div class="sdesc">识别自家产品的优势与短板</div></div></div>
+      <div class="step"><div class="snum">②</div><div><div class="stit">制定产品策略</div><div class="sdesc">差异化定位，避免同质化竞争</div></div></div>
+      <div class="step"><div class="snum">③</div><div><div class="stit">发现市场机会</div><div class="sdesc">找到用户痛点，指导迭代优先级</div></div></div>
+      <div class="step"><div class="snum">④</div><div><div class="stit">辅助商业决策</div><div class="sdesc">监测行业趋势，预判竞争风险</div></div></div>
+    </div>
+    <div class="card">
+      <div class="ct">三个W — 产品策略核心问题</div>
+      <div style="padding:10px;background:var(--pl);border-radius:8px;margin-bottom:7px;">
+        <div style="font-size:17px;font-weight:500;color:var(--p)">WHO</div>
+        <div style="font-size:12px;color:var(--text2)">目标用户人群是谁？</div>
+      </div>
+      <div style="padding:10px;background:var(--tl);border-radius:8px;margin-bottom:7px;">
+        <div style="font-size:17px;font-weight:500;color:var(--t)">WHY</div>
+        <div style="font-size:12px;color:var(--text2)">用户为什么选择我们？核心亮点是？</div>
+      </div>
+      <div style="padding:10px;background:var(--al);border-radius:8px;">
+        <div style="font-size:17px;font-weight:500;color:var(--a)">WHAT</div>
+        <div style="font-size:12px;color:var(--text2)">提供什么形态的产品？软件or硬件？</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>不同团队的关注重点</h2>
+  <table>
+    <thead><tr><th>需求方</th><th>关注重点</th><th>报告带来的价值</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge bc">老板</span></td><td>市场定位+功能+体验+技术，<strong>越全越好</strong></td><td>了解竞对战略与商业模式，发现机会点</td></tr>
+      <tr><td><span class="badge bp">产品团队</span></td><td>市场定位+产品功能+用户体验</td><td>明确竞品功能优劣势，掌握新功能规划</td></tr>
+      <tr><td><span class="badge bb">研发团队</span></td><td>模型技术+产品功能（偏技术实现）</td><td>获得技术优化方向，指导自身调整</td></tr>
+      <tr><td><span class="badge bt">运营团队</span></td><td>用户体验+产品功能（留存/日活/月活）</td><td>参考竞品运营策略，复用到自身产品</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sdiv">课堂金句</div>
+  <div class="quote">💬 "你多了解五个AI产品，面试谈薪就可以多要500块钱。"</div>
+  <div class="quote">💬 "内容生成质量好，用户就愿意用你；质量不行，用户再也不会用了。"</div>
+  <div class="quote">💬 "换汤不换药，不一样的方向，底层逻辑都是通的。"</div>
+  <div class="quote">💬 "只选对的，不选贵的。"</div>
+</div>
+
+<!-- ═══════════════════════════════════════ 2. AGI五阶段 ═══ -->
+<div id="tab-agi" class="sec">
+  <h2>通往AGI的五个阶段</h2>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">由OpenAI提出，是AI训练师&AI产品经理<strong>面试高频考点</strong>，点击每行展开详情。</p>
+
+  <div class="agi-row" style="background:var(--tl);border-color:var(--tm);" onclick="togAgi(this)">
+    <div class="agi-dot" style="background:var(--t)">L1</div>
+    <div class="agi-info">
+      <div class="agi-title">聊天机器人 · Chatbots</div>
+      <div class="agi-sub">进行对话互动，回答问题，基本文本生成</div>
+      <div class="agi-extra"><strong>代表：</strong>ChatGPT 3.5 &nbsp;|&nbsp; <strong>竞品分析：</strong>看对话能力 &nbsp;|&nbsp; 只能简单单/多轮对话</div>
+    </div>
+    <span class="agi-st" style="background:var(--tl);color:var(--t)">已完成</span>
+  </div>
+
+  <div class="agi-row" style="background:var(--bl);border-color:var(--bm);" onclick="togAgi(this)">
+    <div class="agi-dot" style="background:var(--b)">L2</div>
+    <div class="agi-info">
+      <div class="agi-title">推理者 · Reasoners</div>
+      <div class="agi-sub">解决博士学位水平复杂问题，深度推理与逻辑分析</div>
+      <div class="agi-extra"><strong>代表：</strong>DeepSeek R1（2024年底）&nbsp;|&nbsp; <strong>竞品分析：</strong>看推理逻辑 &nbsp;|&nbsp; Chain of Thought思维链</div>
+    </div>
+    <span class="agi-st" style="background:var(--bl);color:var(--b)">基本实现</span>
+  </div>
+
+  <div class="agi-row" style="background:var(--al);border-color:var(--am);" onclick="togAgi(this)">
+    <div class="agi-dot" style="background:var(--a)">L3</div>
+    <div class="agi-info">
+      <div class="agi-title">智能体 · Agents ⭐ 当前阶段</div>
+      <div class="agi-sub">代表用户自主运行，执行复杂多步骤任务</div>
+      <div class="agi-extra"><strong>代表：</strong>通义千问（聚合阿里全生态）、美团小美AI、麦纳斯 &nbsp;|&nbsp; <strong>竞品分析：</strong>看工具调用准确率+任务完成度 &nbsp;|&nbsp; 2025年是Agent元年</div>
+    </div>
+    <span class="agi-st" style="background:var(--al);color:var(--a)">当前阶段</span>
+  </div>
+
+  <div class="agi-row" style="background:var(--pl);border-color:var(--pm);" onclick="togAgi(this)">
+    <div class="agi-dot" style="background:var(--p)">L4</div>
+    <div class="agi-info">
+      <div class="agi-title">创新者 · Innovators</div>
+      <div class="agi-sub">解决现有问题，还能创造全新解决方案和发明</div>
+      <div class="agi-extra"><strong>代表：</strong>OpenAI o1（初期）&nbsp;|&nbsp; <strong>竞品分析：</strong>看创新能力，为人类做了多少事 &nbsp;|&nbsp; 连人类都想不到的方案</div>
+    </div>
+    <span class="agi-st" style="background:var(--pl);color:var(--p)">初期阶段</span>
+  </div>
+
+  <div class="agi-row" style="background:var(--gl);border-color:var(--gm);" onclick="togAgi(this)">
+    <div class="agi-dot" style="background:var(--g)">L5</div>
+    <div class="agi-info">
+      <div class="agi-title">组织 · Organizations</div>
+      <div class="agi-sub">AI系统自主运行整个组织的所有工作</div>
+      <div class="agi-extra"><strong>特征：</strong>公司全部岗位由独立Agent完成 &nbsp;|&nbsp; <strong>竞品分析：</strong>暂无明确标准 &nbsp;|&nbsp; 距离落地尚远</div>
+    </div>
+    <span class="agi-st" style="background:var(--gl);color:var(--g)">终极目标</span>
+  </div>
+
+  <div class="hl" style="margin-top:16px;">
+    🎯 <strong>面试必答口诀：</strong>L1看对话能力 → L2看推理逻辑 → L3看工具调用准确率+任务完成度 → L4看创新能力
+  </div>
+
+  <h2>AI产品分类</h2>
+  <div class="grid2">
+    <div class="card">
+      <div class="ct">按模态分类</div>
+      <div style="margin-bottom:7px;"><span class="badge bp">文本类</span> <span style="font-size:12px;color:var(--text2)">文心一言、豆包、智谱清言、通义千问、Kimi</span></div>
+      <div><span class="badge bc">生成式动态</span> <span style="font-size:12px;color:var(--text2)">可灵AI、即梦、智谱清影、腾讯混元</span></div>
+    </div>
+    <div class="card">
+      <div class="ct">按行业分类（垂直领域）</div>
+      <span class="tag">医疗</span><span class="tag">汽车智能座舱</span><span class="tag">教育K12</span><span class="tag">金融</span>
+      <div style="font-size:12px;color:var(--t);margin-top:8px;">💡 有垂直行业背景投递对应岗位大幅加分！</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 3. 产品架构 ═══ -->
+<div id="tab-arch" class="sec">
+  <h2>AI产品四层架构</h2>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">做竞品分析时，可从这四个层面拆解任意AI产品（以Kimi为例）</p>
+
+  <div class="layer-bar">
+    <div class="layer ly1">
+      <div class="ll">USER LAYER · 用户层（最上层）</div>
+      <div class="lt">用户可直观感知的功能与体验</div>
+      <div style="margin-top:6px;"><span class="tag">对话问答</span><span class="tag">PPT生成</span><span class="tag">报告生成</span><span class="tag">文件解析</span><span class="tag">语音交互</span></div>
+    </div>
+    <div style="text-align:center;color:var(--text3);padding:2px;font-size:16px;">↓</div>
+    <div class="layer ly2">
+      <div class="ll">TECH LAYER · 技术/应用层</div>
+      <div class="lt">支撑产品功能的核心技术栈</div>
+      <div style="margin-top:6px;"><span class="tag">Prompt工程</span><span class="tag">Long COT</span><span class="tag">RAG检索增强</span><span class="tag">Agent</span><span class="tag">OCR</span><span class="tag">ASR语音识别</span><span class="tag">TTS</span><span class="tag">图像识别</span></div>
+    </div>
+    <div style="text-align:center;color:var(--text3);padding:2px;font-size:16px;">↓</div>
+    <div class="layer ly3">
+      <div class="ll">MODEL LAYER · 模型层</div>
+      <div class="lt">产品内嵌的具体大模型</div>
+      <div style="margin-top:6px;"><span class="tag">自研大模型</span><span class="tag">开源微调模型</span><span class="tag">第三方API调用</span><span class="tag">ToB模型</span><span class="tag">ToC模型</span></div>
+      <div style="font-size:12px;color:var(--a);margin-top:6px;">Kimi举例：kimi-k2、kimi-1.5（默认）、kimi-thinking-preview</div>
+    </div>
+    <div style="text-align:center;color:var(--text3);padding:2px;font-size:16px;">↓</div>
+    <div class="layer ly4">
+      <div class="ll">INFRA LAYER · 基础设施层（算法层）</div>
+      <div class="lt">底层算法架构与数据存储</div>
+      <div style="margin-top:6px;"><span class="tag">MoE架构</span><span class="tag">Long2Short</span><span class="tag">RLHF对齐</span><span class="tag">RLAIF</span><span class="tag">向量数据库</span><span class="tag">多模态对象存储</span></div>
+      <div style="font-size:12px;color:var(--g);margin-top:6px;">这层由算法团队负责，竞品信息可在官网技术博客找到</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 4. 竞品分类 ═══ -->
+<div id="tab-comp" class="sec">
+  <h2>竞品的两种分类方式</h2>
+
+  <h3>方式一：按关联关系</h3>
+  <div class="ctype ct1">
+    <div class="ct1-tit">🔴 直接竞品（95%以上重叠）</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">与自身产品高度重叠，目标用户人群和功能相同，同一赛道的直接竞争对手</div>
+    <span class="tag">豆包 vs Kimi</span><span class="tag">美团 vs 饿了么</span><span class="tag">抖音 vs 快手</span><span class="tag">网易云 vs QQ音乐</span><span class="tag">耐克 vs 阿迪达斯</span><span class="tag">英雄联盟 vs 王者荣耀</span>
+  </div>
+
+  <div class="ctype ct2">
+    <div class="ct2-tit">🟡 间接竞品（50-60%重叠）</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">产品目标和目标人群有较大相似但不完全一样，功能、场景有部分重叠</div>
+    <span class="tag">Midjourney vs ChatGPT</span><span class="tag">淘宝 vs 京东</span><span class="tag">抖音 vs 小红书</span><span class="tag">携程 vs 美团（酒店）</span>
+  </div>
+
+  <div class="ctype ct3">
+    <div class="ct3-tit">🔵 潜在竞品（争夺用户时间/金钱资源）⚠️ 最易被忽视</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">产品和目标人群都不同，但争夺用户同一项有限资源（时间或金钱）</div>
+    <span class="tag">打王者荣耀时不刷抖音</span><span class="tag">美团潜在竞品：全家/罗森/爱奇艺/预制菜</span>
+    <div style="font-size:12px;color:var(--b);margin-top:6px;">💡 "用户选择它们，就意味着可能没有资源（时间/金钱）选择你。"</div>
+  </div>
+
+  <h3 style="margin-top:18px;">方式二：按分析方向</h3>
+  <table>
+    <thead><tr><th>方向</th><th>定义</th><th>典型案例</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge bt">业务方向</span></td><td>服务相同业务目标/场景，核心商业需求一致（功能形态可不同）</td><td>飞书多维表格 vs 钉钉AI表格</td></tr>
+      <tr><td><span class="badge bp">功能方向</span></td><td>具体功能高度重叠，技术路径或交互逻辑类似</td><td>Cursor vs GitHub Copilot<br>微信播客 vs 喜马拉雅 vs 小宇宙</td></tr>
+      <tr><td><span class="badge bb">用户方向</span></td><td>目标用户画像高度重叠，选择时形成"二选一"场景</td><td>豆包App vs 通义App vs Kimi</td></tr>
+    </tbody>
+  </table>
+
+  <h2>寻找竞品的四个渠道</h2>
+  <div class="grid2">
+    <div class="card"><div class="ct">渠道一</div><div class="stit">📱 应用商店平台</div><div class="sdesc" style="margin-top:5px;">七麦数据、爱思助手，查同类榜单、下载量、更新频率</div></div>
+    <div class="card"><div class="ct">渠道二</div><div class="stit">🌐 公开AI工具站</div><div class="sdesc" style="margin-top:5px;">各类AI产品导航、垂直领域工具集合，快速发现新兴竞品</div></div>
+    <div class="card"><div class="ct">渠道三</div><div class="stit">💭 用户反馈渠道</div><div class="sdesc" style="margin-top:5px;">小红书、抖音、论坛中用户提到的替代产品，最真实的竞品来源</div></div>
+    <div class="card"><div class="ct">渠道四</div><div class="stit">🖐️ 亲手体验调研</div><div class="sdesc" style="margin-top:5px;">找到竞品后必须亲自实操，才能获得真实功能信息</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 5. 分析流程 ═══ -->
+<div id="tab-flow" class="sec">
+  <h2>竞品分析完整流程（五步法）</h2>
+
+  <div class="flow">
+    <div class="fstep" style="background:var(--pl);color:var(--p);border:0.5px solid var(--pm)">① 明确目的</div>
+    <div class="farr">→</div>
+    <div class="fstep" style="background:var(--tl);color:var(--t);border:0.5px solid var(--tm)">② 选择竞品</div>
+    <div class="farr">→</div>
+    <div class="fstep" style="background:var(--al);color:var(--a);border:0.5px solid var(--am)">③ 确定维度</div>
+    <div class="farr">→</div>
+    <div class="fstep" style="background:var(--bl);color:var(--b);border:0.5px solid var(--bm)">④ 数据收集&amp;评测</div>
+    <div class="farr">→</div>
+    <div class="fstep" style="background:var(--cl);color:var(--c);border:0.5px solid var(--cm)">⑤ 分析&amp;产出报告</div>
+  </div>
+
+  <div class="sdiv">步骤详解</div>
+
+  <h3>① 明确目的 — 报告为谁而做？</h3>
+  <div class="card">95%以上AI训练师需求来自内部团队。必须先明确需求方，因为不同团队对维度的要求完全不同（参见概念总览中的团队需求表）。</div>
+
+  <h3>② 选择竞品 — 功能类似+需求相同+用户重叠+可互相替代</h3>
+  <div class="card">关联方向（直接/间接/潜在）+ 分析方向（业务/功能/用户）→ 详见"竞品分类"章节</div>
+
+  <h3>③ 确定分析维度 — 以目标决定范围，不是越多越好</h3>
+  <div class="hl-a hl" style="margin-top:0;">举例：仅分析 Deep Research 效果 → 只看<strong>核心功能 + 内容生成质量</strong>，不需要覆盖市场定位、模型技术等所有维度</div>
+  <table>
+    <thead><tr><th>分析框架</th><th>拆解维度</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge bb">市场定位</span></td><td>产品定位、目标人群、市场规模、商业模式</td></tr>
+      <tr><td><span class="badge bt">产品功能</span></td><td>核心功能、功能矩阵对比</td></tr>
+      <tr><td><span class="badge bp">模型技术</span></td><td>模型架构、训练数据、核心技术、性能指标</td></tr>
+      <tr><td><span class="badge ba">用户体验</span></td><td>交互流程、界面设计、<strong>内容质量 ⭐</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>④ 数据收集 — 三条路径</h3>
+  <div class="grid3">
+    <div style="border-radius:var(--r);border:1.5px solid var(--bm);overflow:hidden;">
+      <div style="background:var(--bl);padding:10px 12px;text-align:center;">
+        <div style="font-size:18px;">🔎</div>
+        <div style="font-weight:500;font-size:13px;color:var(--b);">公开信息检索</div>
+        <div style="font-size:11px;color:var(--text2);">市场定位、模型技术</div>
+      </div>
+      <div style="padding:8px 12px;font-size:12px;color:var(--text2);">
+        <span class="tag">艾瑞咨询报告</span><span class="tag">官方白皮书</span><span class="tag">第三方评测站</span><span class="tag">官网参数页</span>
+      </div>
+    </div>
+    <div style="border-radius:var(--r);border:1.5px solid var(--cm);overflow:hidden;">
+      <div style="background:var(--cl);padding:10px 12px;text-align:center;">
+        <div style="font-size:18px;">📱</div>
+        <div style="font-weight:500;font-size:13px;color:var(--c);">AI产品体验</div>
+        <div style="font-size:11px;color:var(--text2);">产品功能、用户体验</div>
+      </div>
+      <div style="padding:8px 12px;font-size:12px;">
+        <span class="tag">注册账号</span><span class="tag">体验核心功能</span><span class="tag">发Prompt测效果</span>
+        <div style="color:var(--c);margin-top:5px;font-weight:500;">⚠️ 必须亲手实操！</div>
+      </div>
+    </div>
+    <div style="border-radius:var(--r);border:1.5px solid var(--pm);overflow:hidden;">
+      <div style="background:var(--pl);padding:10px 12px;text-align:center;">
+        <div style="font-size:18px;">💬</div>
+        <div style="font-weight:500;font-size:13px;color:var(--p);">用户调研</div>
+        <div style="font-size:11px;color:var(--text2);">真实需求与感受</div>
+      </div>
+      <div style="padding:8px 12px;font-size:12px;color:var(--text2);">
+        <div style="margin-bottom:4px;"><strong style="color:var(--text)">定性访谈</strong>：邀请深度用户线上/线下交流，有奖品激励</div>
+        <div><strong style="color:var(--text)">定量问卷</strong>：结构化问题量化打分，验证问题是否真实存在</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:14px;">⑤ 产出报告 — 三大硬性要求</h3>
+  <div class="grid3">
+    <div style="background:var(--cl);border:0.5px solid var(--cm);border-radius:var(--r);padding:11px 13px;">
+      <div style="font-weight:500;color:var(--c);font-size:13px;">结论前置</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:4px;">最终评测结论放在报告最开头，再展开分析过程</div>
+    </div>
+    <div style="background:var(--bl);border:0.5px solid var(--bm);border-radius:var(--r);padding:11px 13px;">
+      <div style="font-weight:500;color:var(--b);font-size:13px;">结构清晰</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:4px;">分段分层，重点加粗标黄，不能一坨字没有分段</div>
+    </div>
+    <div style="background:var(--tl);border:0.5px solid var(--tm);border-radius:var(--r);padding:11px 13px;">
+      <div style="font-weight:500;color:var(--t);font-size:13px;">数据支撑</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:4px;">所有结论必须对应真实评测数据，不能凭感觉</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 6. 四大维度 ═══ -->
+<div id="tab-dims" class="sec">
+  <h2>AI竞品评测的四个核心维度</h2>
+
+  <div class="acc">
+    <div class="acc-hd" style="background:var(--bl);" onclick="togAcc(this)">
+      <span>📊 维度一：市场定位</span><span class="acc-ic">▶</span>
+    </div>
+    <div class="acc-bd">
+      <div class="grid3" style="margin-bottom:10px;">
+        <div style="padding:10px;background:var(--bl);border-radius:8px;border:0.5px solid var(--bm);">
+          <div style="font-weight:500;font-size:13px;color:var(--b)">产品定位</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px;">明确竞品的市场定位、核心价值主张和差异化策略</div>
+        </div>
+        <div style="padding:10px;background:var(--bl);border-radius:8px;border:0.5px solid var(--bm);">
+          <div style="font-weight:500;font-size:13px;color:var(--b)">目标人群</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px;">分析用户画像、需求及痛点，梳理不同人群占比</div>
+        </div>
+        <div style="padding:10px;background:var(--bl);border-radius:8px;border:0.5px solid var(--bm);">
+          <div style="font-weight:500;font-size:13px;color:var(--b)">市场规模</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px;">评估市场容量、增长趋势及渗透率，看还有没有蛋糕</div>
+        </div>
+      </div>
+      <div class="hl-b hl">📌 举例：淘宝（种类全/参差不齐）vs 京东（科技数码/配送快）vs 拼多多（百亿补贴/低价）— 三者定位完全不同</div>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hd" style="background:var(--pl);" onclick="togAcc(this)">
+      <span>🤖 维度二：模型技术</span><span class="acc-ic">▶</span>
+    </div>
+    <div class="acc-bd">
+      <table>
+        <thead><tr><th>分析点</th><th>具体内容</th><th>获取方式</th></tr></thead>
+        <tbody>
+          <tr><td>基础模型类型</td><td>自研大模型 / 开源微调 / 第三方API调用</td><td>官网、技术博客</td></tr>
+          <tr><td>模型性能评测</td><td>代码能力、上下文理解、语言能力、推理能力</td><td>亲自测试、评测报告</td></tr>
+          <tr><td>独特技术/算法</td><td>是否有创新技术、特殊架构（如MoE）</td><td>官网技术介绍、论坛</td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:12px;color:var(--c);margin-top:8px;padding:8px;background:var(--cl);border-radius:6px;">⚠️ 案例：Cursor曾宣称自研第二代模型，结果被发现是套壳Kimi k2.5，CEO公开道歉</div>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hd" style="background:var(--tl);" onclick="togAcc(this)">
+      <span>⚙️ 维度三：产品功能</span><span class="acc-ic">▶</span>
+    </div>
+    <div class="acc-bd">
+      <div class="step"><div class="snum" style="background:var(--tl);color:var(--t)">①</div><div><div class="stit">核心功能对比</div><div class="sdesc">比较各竞品主要功能模块及实现方式，通过用户群、技术论坛了解</div></div></div>
+      <div class="step"><div class="snum" style="background:var(--tl);color:var(--t)">②</div><div><div class="stit">技术能力分析</div><div class="sdesc">安全性、稳定性、部署成本、本地化GPU资源消耗</div></div></div>
+      <div class="step"><div class="snum" style="background:var(--tl);color:var(--t)">③</div><div><div class="stit">功能矩阵 ⭐ 报告中最重要的可视化方式</div><div class="sdesc">用✅❌标注各产品功能有无，直观展示差异化</div></div></div>
+      <div style="margin-top:10px;overflow-x:auto;">
+        <table style="font-size:12px;">
+          <thead><tr><th>功能</th><th>产品A（我们）</th><th>豆包</th><th>Kimi</th><th>通义千问</th></tr></thead>
+          <tbody>
+            <tr><td>长文本对话</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+            <tr><td>文生图</td><td>❌</td><td>✅</td><td>❌</td><td>✅</td></tr>
+            <tr><td>PPT生成</td><td>✅</td><td>❌</td><td>✅</td><td>❌</td></tr>
+            <tr><td>Agent任务</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-hd" style="background:var(--al);" onclick="togAcc(this)">
+      <span>🎯 维度四：用户体验 ⭐ AI训练师最核心</span><span class="acc-ic">▶</span>
+    </div>
+    <div class="acc-bd">
+      <div class="grid3">
+        <div style="padding:10px;background:var(--al);border-radius:8px;">
+          <div style="font-weight:500;font-size:13px;color:var(--a)">交互流程</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px;">路径越短越好。例：长按输入框直接发语音 > 先点图标再发语音</div>
+        </div>
+        <div style="padding:10px;background:var(--al);border-radius:8px;">
+          <div style="font-weight:500;font-size:13px;color:var(--a)">界面设计(UI)</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px;">评估界面布局、信息层级、视觉动线及组件使用</div>
+        </div>
+        <div style="padding:10px;background:var(--cl);border-radius:8px;border:1px solid var(--cm);">
+          <div style="font-weight:500;font-size:13px;color:var(--c)">🌟 内容质量</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px;"><strong>AI训练师最核心工作！</strong>判断生成内容是否符合用户满意度</div>
+        </div>
+      </div>
+      <div class="hl-c hl" style="margin-top:10px;">
+        🔑 AI训练师做竞品评测记住两个重点：<strong>①产品功能与竞品的差异 ②AI内容生成质量的好坏</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 7. Deep Research ═══ -->
+<div id="tab-deep" class="sec">
+  <h2>什么是 Deep Research？</h2>
+  <div class="hl-b hl" style="font-size:14px;">
+    OpenAI于2025年2月首次提出，让AI从<strong>简单问答</strong>升级为<strong>智能研究员</strong>，自动完成：信息检索 → 筛选阅读 → 交叉推理 → 报告生成 的完整研究闭环。<br>
+    <span style="font-size:12px;color:var(--text2);">🚀 可在13分钟内生成人类分析师需要一周、博士需要数月才能完成的研究报告，带引用来源，可信度高</span>
+  </div>
+
+  <h2>Deep Research vs 传统 RAG</h2>
+  <div class="vs">
+    <div class="vs-l">
+      <div class="vs-tit">📚 传统RAG · 图书馆员</div>
+      <div class="vs-li">你问一个问题</div>
+      <div class="vs-li">直接从知识库检索</div>
+      <div class="vs-li">裁切对应内容输出</div>
+      <div class="vs-li">一次搜索，直接输出</div>
+      <div class="vs-li">置信度一般</div>
+    </div>
+    <div class="vs-m">VS</div>
+    <div class="vs-r">
+      <div class="vs-tit">🎓 Deep Research · 老师备课</div>
+      <div class="vs-li">你问一个问题</div>
+      <div class="vs-li">自主规划研究流程</div>
+      <div class="vs-li">多轮搜索 + 交叉验证</div>
+      <div class="vs-li">循环推理直到满意</div>
+      <div class="vs-li">输出高质量结构化报告</div>
+    </div>
+  </div>
+
+  <h2>工作流程</h2>
+  <div class="dr-flow">
+    <div class="dr-step" style="background:var(--bl)"><div class="dr-n" style="background:var(--bm)">1</div><strong style="color:var(--b)">意图理解</strong><span style="color:var(--text2)">— 解析用户问题，自主制定研究规划</span></div>
+    <div class="dr-arr">↓</div>
+    <div class="dr-step" style="background:var(--pl)"><div class="dr-n" style="background:var(--pm)">2</div><strong style="color:var(--p)">多轮搜索</strong><span style="color:var(--text2)">— 不止一次，覆盖上百个网站</span></div>
+    <div class="dr-arr">↓</div>
+    <div class="dr-step" style="background:var(--al)"><div class="dr-n" style="background:var(--am)">3</div><strong style="color:var(--a)">筛选阅读</strong><span style="color:var(--text2)">— 判断信息有效性，摘取有用内容</span></div>
+    <div class="dr-arr">↓</div>
+    <div class="dr-step" style="background:var(--tl)"><div class="dr-n" style="background:var(--tm)">4</div><strong style="color:var(--t)">交叉推理</strong><span style="color:var(--text2)">— 整合多源信息，循环验证直到满意</span></div>
+    <div class="dr-arr">↓</div>
+    <div class="dr-step" style="background:var(--cl)"><div class="dr-n" style="background:var(--cm)">5</div><strong style="color:var(--c)">报告生成</strong><span style="color:var(--text2)">— 输出有引用来源、结构化的深度报告</span></div>
+  </div>
+
+  <h2>各产品功能矩阵对比</h2>
+  <table>
+    <thead><tr><th>产品</th><th>Deep Research入口</th><th>二级分类</th><th>分类方向</th></tr></thead>
+    <tbody>
+      <tr><td><strong>纳米搜索</strong></td><td>独立二级页面</td><td style="color:var(--t)">✅ 有细分</td><td>研究、营销、文案、视频、图片</td></tr>
+      <tr><td><strong>智谱清言</strong></td><td>二级页面</td><td style="color:var(--t)">✅ 有细分</td><td>学术、攻略、金融、生活、创作</td></tr>
+      <tr><td><strong>Coze空间</strong></td><td>一级页面入口</td><td style="color:var(--a)">❌ 无分类</td><td>通用方向，直接输入问题</td></tr>
+      <tr><td><strong>百度心响</strong></td><td>仅入口按钮</td><td style="color:var(--a)">❌ 无分类</td><td>—</td></tr>
+      <tr><td><strong>ChatGPT（间接）</strong></td><td>集成于主界面</td><td>—</td><td>海外头部参照基准</td></tr>
+    </tbody>
+  </table>
+
+  <h2>评测维度 &amp; 评测集构建</h2>
+  <div class="grid2">
+    <div class="card">
+      <div class="ct">四个评测维度</div>
+      <div class="step"><div class="snum" style="background:var(--tl);color:var(--t)">✓</div><div><div class="stit">生成稳定性</div><div class="sdesc">同一问题多次测试，结果是否一致</div></div></div>
+      <div class="step"><div class="snum" style="background:var(--tl);color:var(--t)">✓</div><div><div class="stit">逻辑严密度</div><div class="sdesc">推理链条是否清晰，结论是否有依据</div></div></div>
+      <div class="step"><div class="snum" style="background:var(--tl);color:var(--t)">✓</div><div><div class="stit">信息源准确性</div><div class="sdesc">引用来源是否真实，是否存在幻觉</div></div></div>
+      <div class="step"><div class="snum" style="background:var(--tl);color:var(--t)">✓</div><div><div class="stit">信息时效性</div><div class="sdesc">检索到的内容是否足够新，是否过时</div></div></div>
+    </div>
+    <div class="card">
+      <div class="ct">评测集构建建议</div>
+      <div class="hl-a hl" style="margin:0 0 8px;">整合所有产品都覆盖的方向：新闻聚合、金融研究、学术文献，每方向做<strong>20条</strong>数据</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px;">💡 产品已有的分类提示词，<strong>改写润色</strong>后可直接作为评测集数据，不需从零构建</div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;padding:8px;background:var(--pl);border-radius:8px;text-align:center;">
+          <div style="font-weight:500;color:var(--p);font-size:12px;">分级法</div>
+          <div style="font-size:11px;color:var(--text2);">高 / 中 / 低</div>
+        </div>
+        <div style="flex:1;padding:8px;background:var(--bl);border-radius:8px;text-align:center;">
+          <div style="font-weight:500;color:var(--b);font-size:12px;">打分制</div>
+          <div style="font-size:11px;color:var(--text2);">0-1-2-3分</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 8. 模型选型 ═══ -->
+<div id="tab-model" class="sec">
+  <h2>模型选型的本质</h2>
+  <div class="hl-a hl" style="font-size:14px;">
+    🎯 <strong>最强模型 ≠ 最佳方案</strong>，一个模型无法解决所有问题<br>
+    选型本质：在<strong>质量、成本、时延、可控性</strong>四个维度之间做权衡，而非追求单点能力最强
+  </div>
+
+  <h2>四个权衡维度</h2>
+  <div class="grid2">
+    <div style="border-radius:var(--r);border:0.5px solid var(--tm);padding:12px 14px;background:var(--tl);">
+      <div style="font-size:17px;font-weight:500;color:var(--t)">质量</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:4px;">生成内容的质量好坏，是否符合业务需求</div>
+    </div>
+    <div style="border-radius:var(--r);border:0.5px solid var(--cm);padding:12px 14px;background:var(--cl);">
+      <div style="font-size:17px;font-weight:500;color:var(--c)">成本</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:4px;">API调用费用 + 本地部署的显卡硬件成本（Token消耗）</div>
+    </div>
+    <div style="border-radius:var(--r);border:0.5px solid var(--bm);padding:12px 14px;background:var(--bl);">
+      <div style="font-size:17px;font-weight:500;color:var(--b)">时延</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:4px;">整体生成速度 + 首字输出响应时间（用户体感关键）</div>
+    </div>
+    <div style="border-radius:var(--r);border:0.5px solid var(--pm);padding:12px 14px;background:var(--pl);">
+      <div style="font-size:17px;font-weight:500;color:var(--p)">可控性</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:4px;">① 能否用 System Prompt 控制输出<br>② 是否支持微调，符合业务效果</div>
+    </div>
+  </div>
+
+  <h2>三个选型层级（可交互）</h2>
+  <div class="ms-row">
+    <div class="ms-label">模态 — 回答"要不要多模态"</div>
+    <div class="ms-opts">
+      <div class="ms-opt" onclick="this.classList.toggle('sel')">纯文本</div>
+      <div class="ms-opt" onclick="this.classList.toggle('sel')">图片</div>
+      <div class="ms-opt" onclick="this.classList.toggle('sel')">视频</div>
+      <div class="ms-opt" onclick="this.classList.toggle('sel')">音频</div>
+      <div class="ms-opt" onclick="this.classList.toggle('sel')">多模态全选</div>
+    </div>
+    <div class="ms-hint">例：AI漫剧产品 → 图片+视频+音频</div>
+  </div>
+  <div class="ms-row">
+    <div class="ms-label">能力 — 回答"需不需要强推理"</div>
+    <div class="ms-opts">
+      <div class="ms-opt" onclick="this.classList.toggle('sel')">基础理解</div>
+      <div class="ms-opt" onclick="this.classList.toggle('sel')">文本生成</div>
+      <div class="ms-opt" onclick="this.classList.toggle('sel')">深度推理</div>
+      <div class="ms-opt" onclick="this.classList.toggle('sel')">指令控制</div>
+    </div>
+    <div class="ms-hint">例：数学/论文场景 → 必须深度推理</div>
+  </div>
+  <div class="ms-row">
+    <div class="ms-label">形态 — 考虑成本/合规/可控性</div>
+    <div class="ms-opts">
+      <div class="ms-opt" onclick="this.classList.toggle('sel')">开源免费</div>
+      <div class="ms-opt" onclick="this.classList.toggle('sel')">API调用</div>
+      <div class="ms-opt" onclick="this.classList.toggle('sel')">本地部署</div>
+    </div>
+    <div class="ms-hint">小公司选开源 · 大公司根据合规需求选本地部署</div>
+  </div>
+
+  <h2>案例：小公司聊天机器人选型</h2>
+  <div class="grid3">
+    <div style="text-align:center;padding:14px;background:var(--tl);border-radius:var(--r);border:0.5px solid var(--tm);">
+      <div style="font-size:20px;">📝</div><div style="font-weight:500;color:var(--t);margin-top:4px;">模态</div>
+      <div style="font-size:12px;color:var(--text2);">纯文本，不需要多模态</div>
+    </div>
+    <div style="text-align:center;padding:14px;background:var(--bl);border-radius:var(--r);border:0.5px solid var(--bm);">
+      <div style="font-size:20px;">🧠</div><div style="font-weight:500;color:var(--b);margin-top:4px;">能力</div>
+      <div style="font-size:12px;color:var(--text2);">基础理解+生成，不需要强推理</div>
+    </div>
+    <div style="text-align:center;padding:14px;background:var(--pl);border-radius:var(--r);border:0.5px solid var(--pm);">
+      <div style="font-size:20px;">💰</div><div style="font-weight:500;color:var(--p);margin-top:4px;">形态</div>
+      <div style="font-size:12px;color:var(--text2);">开源免费，节约成本</div>
+    </div>
+  </div>
+  <div class="hl-t hl" style="margin-top:10px;">
+    ✅ 选型标准：<strong>成本低 + 输出稳定 + 指令遵循能力强</strong> 三项满足即可，不追求最强
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 9. 报告&工具 ═══ -->
+<div id="tab-report" class="sec">
+  <h2>SWOT 分析框架</h2>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">AI训练师只负责写 S（优势）和 W（劣势），O/T 由产品经理/老板决策。</p>
+  <div class="swot">
+    <div class="sw sw-s">
+      <div class="sw-big">S</div>
+      <div class="sw-nm">Strengths · 内部优势</div>
+      <div class="sw-desc">比竞品强在哪里？例：动漫风格生成质量高、上下文记忆更长、响应更快</div>
+      <div style="margin-top:7px;font-size:11px;background:var(--tl);color:var(--t);padding:3px 7px;border-radius:5px;display:inline-block;">✅ AI训练师负责</div>
+    </div>
+    <div class="sw sw-w">
+      <div class="sw-big">W</div>
+      <div class="sw-nm">Weaknesses · 内部劣势</div>
+      <div class="sw-desc">比竞品弱在哪里？例：实体/植物生成效果差、不支持长文档解析</div>
+      <div style="margin-top:7px;font-size:11px;background:var(--cl);color:var(--c);padding:3px 7px;border-radius:5px;display:inline-block;">✅ AI训练师负责</div>
+    </div>
+    <div class="sw sw-o">
+      <div class="sw-big">O</div>
+      <div class="sw-nm">Opportunities · 外部机会</div>
+      <div class="sw-desc">市场上有哪些机会？例：垂直行业空白、竞品下架某功能</div>
+      <div style="margin-top:7px;font-size:11px;background:var(--bl);color:var(--b);padding:3px 7px;border-radius:5px;display:inline-block;">📋 产品经理/老板负责</div>
+    </div>
+    <div class="sw sw-t">
+      <div class="sw-big">T</div>
+      <div class="sw-nm">Threats · 外部威胁</div>
+      <div class="sw-desc">有哪些外部风险？例：头部竞品快速迭代、政策法规变化</div>
+      <div style="margin-top:7px;font-size:11px;background:var(--al);color:var(--a);padding:3px 7px;border-radius:5px;display:inline-block;">📋 产品经理/老板负责</div>
+    </div>
+  </div>
+
+  <h2>报告结构模板</h2>
+  <div style="border:0.5px solid var(--bd);border-radius:var(--rl);overflow:hidden;margin-bottom:18px;">
+    <div style="background:var(--cl);padding:11px 14px;border-bottom:0.5px solid var(--bd);">
+      <div style="font-weight:500;font-size:13px;color:var(--c)">1. 结论前置 ⭐</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:2px;">例："纳米搜索 Deep Research 效果 > Coze空间"，直接写明最终结论</div>
+    </div>
+    <div style="background:var(--bl);padding:11px 14px;border-bottom:0.5px solid var(--bd);">
+      <div style="font-weight:500;font-size:13px;color:var(--b)">2. 背景与目标</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:2px;">分析背景、本次分析的四个目的、竞品范围说明</div>
+    </div>
+    <div style="background:var(--pl);padding:11px 14px;border-bottom:0.5px solid var(--bd);">
+      <div style="font-weight:500;font-size:13px;color:var(--p)">3. 分析过程（各维度详细数据）</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:2px;">功能矩阵 / 评测结果表格 / 四象限市场定位图 / SWOT</div>
+    </div>
+    <div style="background:var(--tl);padding:11px 14px;">
+      <div style="font-weight:500;font-size:13px;color:var(--t)">4. 建议与洞察</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:2px;">基于数据提出可落地的产品迭代建议</div>
+    </div>
+  </div>
+
+  <h2>推荐工具</h2>
+  <div class="tool">
+    <div class="tool-ic" style="background:var(--bl);">📊</div>
+    <div>
+      <div class="tool-nm">第三方大模型对比网站 <span class="ptag pfree">免费</span></div>
+      <div class="tool-desc">搜索大模型名称可查豆包/DeepSeek/千问等；每日自动更新版本号、评分、功能；数据可直接提取制作图表</div>
+      <div style="margin-top:5px;"><span class="tag">每日更新</span><span class="tag">可视化数据</span><span class="tag">适合作业</span></div>
+    </div>
+  </div>
+  <div class="tool">
+    <div class="tool-ic" style="background:var(--al);">📈</div>
+    <div>
+      <div class="tool-nm">艾瑞咨询 <span class="ptag pfree">部分免费</span></div>
+      <div class="tool-desc">大量公开行业报告，搜索agent/AI搜索等主题获取市场规模、用户人群、商业模式等宏观数据</div>
+    </div>
+  </div>
+  <div class="tool">
+    <div class="tool-ic" style="background:var(--pl);">🔀</div>
+    <div>
+      <div class="tool-nm">多模型并行对比工具 <span class="ptag ppaid">付费</span></div>
+      <div class="tool-desc">同时让6个模型对同一个Prompt生成内容，覆盖Claude、GPT、Grok、千问等最新主流模型</div>
+      <div style="margin-top:5px;"><span class="tag">6模型同时对比</span></div>
+    </div>
+  </div>
+  <div class="tool">
+    <div class="tool-ic" style="background:var(--cl);">⚠️</div>
+    <div>
+      <div class="tool-nm">Cherry Studio等聚合工具 <span class="ptag ppaid">付费</span></div>
+      <div class="tool-desc">通过API调用多个AI的聚合工具。<strong>注意：</strong>建议优先使用官网原生模型，API调用可能存在效果降质，评测结果不够准确</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ 10. 知识速查 ═══ -->
+<div id="tab-review" class="sec">
+  <h2>面试知识速查 · 全天合并版</h2>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">点击问题展开答案，适合睡前复习</p>
+
+  <div class="sdiv">基础概念</div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: AGI五个阶段分别是什么？各有什么代表产品？</div><div class="qa-a">L1聊天机器人（ChatGPT 3.5） → L2推理者（DeepSeek R1） → L3智能体（通义千问/小美AI）→ L4创新者（OpenAI o1）→ L5组织（尚未实现）<br>当前处于L3，2025年是Agent元年；L4已进入初期。</div></div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 不同阶段竞品分析的核心维度是什么？（面试高频）</div><div class="qa-a">L1看<strong>对话能力</strong> → L2看<strong>推理逻辑</strong> → L3看<strong>工具调用准确率+任务完成度</strong> → L4看<strong>创新能力</strong></div></div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: AI产品四层架构是哪四层？</div><div class="qa-a">用户层（用户直观感知的功能与体验）→ 技术/应用层（Prompt/RAG/Agent/OCR等）→ 模型层（内嵌大模型，分ToB/ToC）→ 基础设施层（算法架构/向量数据库/训练日志）</div></div>
+
+  <div class="sdiv">竞品分类</div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 直接/间接/潜在竞品的定义与案例？</div><div class="qa-a">直接竞品：95%以上高度重叠（豆包 vs Kimi）<br>间接竞品：50-60%重叠（Midjourney vs ChatGPT）<br>潜在竞品：争夺用户同一项有限资源时间/金钱（王者荣耀 vs 抖音）<br>⚠️ 潜在竞品最容易被忽视！</div></div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 按分析方向如何分类竞品？各举一个例子</div><div class="qa-a">业务方向：服务相同业务目标（飞书多维表格 vs 钉钉AI表格）<br>功能方向：具体功能高度重叠（Cursor vs GitHub Copilot）<br>用户方向：目标用户画像高度重叠（豆包 vs 通义 vs Kimi）</div></div>
+
+  <div class="sdiv">分析框架与流程</div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 竞品分析流程五步法？</div><div class="qa-a">①明确目的（为谁而做，需求方是谁）→ ②选择竞品 → ③确定分析维度（以目标决定，不是越多越好）→ ④数据收集&评测（公开检索+亲身体验+用户调研）→ ⑤分析&产出报告（结论前置）</div></div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: AI竞品评测的四个核心维度是什么？</div><div class="qa-a">①市场定位（产品定位/目标人群/市场规模/商业模式）<br>②产品功能（核心功能/功能矩阵对比）<br>③模型技术（基础模型类型/性能评测/独特技术）<br>④用户体验（交互流程/界面设计/内容质量⭐）</div></div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: AI训练师做竞品评测最核心的两个重点是什么？</div><div class="qa-a">①产品功能与竞品的差异（功能矩阵对比）<br>②AI内容生成质量的好坏（判断生成内容是否符合用户满意度）<br>这两点抓住了，核心评测工作就完成了。</div></div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 不同团队对竞品分析报告的侧重点？</div><div class="qa-a">老板：越全越好，关注市场定位与技术方向<br>产品团队：功能+用户体验+市场定位（细分市场30-40%）<br>研发团队：模型技术+代码实现<br>运营团队：用户体验+留存/日活/月活指标</div></div>
+
+  <div class="sdiv">深度专题</div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: Deep Research 和传统 RAG 的核心区别？</div><div class="qa-a">RAG = 图书馆员：你问 → 直接检索知识库 → 裁切输出，一步到位，置信度一般<br>Deep Research = 老师备课：你问 → 自主规划研究流程 → 多轮搜索 → 交叉验证 → 循环推理 → 输出高质量报告<br>核心差异：多了"自主思考推理的闭环流程"</div></div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 模型选型的四个权衡维度？本质是什么？</div><div class="qa-a">本质：在质量、成本、时延、可控性之间做权衡，而非追求单点能力最强（"只选对的，不选贵的"）<br>质量：内容生成质量 &nbsp; 成本：API费用+显卡成本 &nbsp; 时延：生成速度+首字响应时间 &nbsp; 可控性：System Prompt控制+微调支持</div></div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 模型选型的三个核心层级分别是什么？</div><div class="qa-a">①模态：文本/图片/视频/音频，回答"要不要多模态"<br>②能力：理解/生成/推理/控制，回答"需不需要强推理"<br>③形态：API调用/开源模型/本地部署，考虑成本/合规/可控性</div></div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 数据收集的三条路径是什么？各适合什么维度？</div><div class="qa-a">①公开信息检索（官网/行业报告/白皮书）→ 市场定位、模型技术<br>②AI产品体验（亲手实操，必须！）→ 产品功能、用户体验<br>③用户调研（定性访谈+定量问卷）→ 真实需求与使用感受</div></div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: SWOT中AI训练师通常负责哪部分？为什么？</div><div class="qa-a">只负责 S（优势）和 W（劣势），即自身产品与竞品相比的优劣对比<br>O（机会）和 T（威胁）由产品经理/老板负责，因为涉及更高层级的市场战略决策</div></div>
+
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 功能矩阵是什么？如何构建？</div><div class="qa-a">将各产品功能整理成对比表格，用✅❌标注功能有无，是报告中最直观的差异化展示方式<br>构建方法：列出各产品核心功能，按行（功能）×列（产品）打勾打叉，一眼看出差距</div></div>
+
+  <div style="margin-top:20px;padding:14px;background:var(--al);border-radius:var(--rl);border:0.5px solid var(--am);">
+    <div style="font-weight:500;color:var(--a);margin-bottom:8px;">💬 全天课堂金句汇总</div>
+    <div class="quote" style="margin-bottom:4px;">"你多了解五个AI产品，面试谈薪就可以多要500块钱。"</div>
+    <div class="quote" style="margin-bottom:4px;">"内容生成质量好，用户就愿意用你；质量不行，用户再也不会用了。"</div>
+    <div class="quote" style="margin-bottom:4px;">"RAG就像图书馆员，你问他，他把书里内容裁切发给你；Deep Research是老师，你问他之后，他会去给你备课，然后再跟你讲。"</div>
+    <div class="quote" style="margin-bottom:4px;">"换汤不换药，不一样的方向，底层逻辑都是通的。"</div>
+    <div class="quote">"只选对的，不选贵的。"</div>
+  </div>
+</div>
+
+</div>
+<script>
+function sw(n){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
+  event.target.classList.add('active');
+}
+function togAgi(el){
+  const e=el.querySelector('.agi-extra');
+  e.style.display=e.style.display==='block'?'none':'block';
+}
+function togAcc(hd){
+  const bd=hd.nextElementSibling;
+  const ic=hd.querySelector('.acc-ic');
+  bd.classList.toggle('open');
+  ic.classList.toggle('open');
+}
+function tq(el){
+  el.nextElementSibling.classList.toggle('show');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI大模型评测 · 我的笔记</title>
+<style>
+:root{
+  --p:#534AB7;--pl:#EEEDFE;--pm:#7F77DD;
+  --t:#1D9E75;--tl:#E1F5EE;--tm:#5DCAA5;
+  --a:#BA7517;--al:#FAEEDA;--am:#EF9F27;
+  --c:#993C1D;--cl:#FAECE7;--cm:#D85A30;
+  --b:#185FA5;--bl:#E6F1FB;--bm:#378ADD;
+  --g:#5F5E5A;--gl:#F1EFE8;--gm:#888780;
+  --text:#2C2C2A;--text2:#5F5E5A;--text3:#888780;
+  --bg:#fff;--bg2:#F1EFE8;--bd:rgba(44,44,42,0.15);
+  --r:10px;--rl:16px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --text:#e8e6de;--text2:#b4b2a9;--text3:#888780;
+  --bg:#1e1e1c;--bg2:#2c2c2a;--bd:rgba(255,255,255,0.12);
+  --p:#AFA9EC;--pl:#26215C;--pm:#7F77DD;
+  --t:#5DCAA5;--tl:#04342C;--tm:#1D9E75;
+  --a:#EF9F27;--al:#412402;--am:#BA7517;
+  --c:#F0997B;--cl:#4A1B0C;--cm:#D85A30;
+  --b:#85B7EB;--bl:#042C53;--bm:#378ADD;
+  --g:#B4B2A9;--gl:#2C2C2A;--gm:#5F5E5A;
+}}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.65;}
+.page{max-width:880px;margin:0 auto;padding:24px 16px 70px;}
+h1{font-size:22px;font-weight:500;margin-bottom:4px;}
+h2{font-size:17px;font-weight:500;margin:26px 0 10px;}
+h3{font-size:14px;font-weight:500;margin:14px 0 7px;}
+p.sub{font-size:13px;color:var(--text3);margin-bottom:20px;}
+.nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:24px;border-bottom:0.5px solid var(--bd);padding-bottom:12px;}
+.nav button{border:0.5px solid var(--bd);background:transparent;color:var(--text2);border-radius:20px;padding:5px 13px;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.nav button:hover{background:var(--bg2);}
+.nav button.active{background:var(--pl);border-color:var(--pm);color:var(--p);font-weight:500;}
+.sec{display:none;}.sec.active{display:block;}
+.card{background:var(--bg2);border-radius:var(--r);padding:14px;margin-bottom:10px;border:0.5px solid var(--bd);}
+.ct{font-size:11px;font-weight:500;color:var(--text3);margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--bg2);padding:8px 10px;text-align:left;font-weight:500;color:var(--text2);border-bottom:0.5px solid var(--bd);}
+td{padding:8px 10px;border-bottom:0.5px solid var(--bd);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500;}
+.bp{background:var(--pl);color:var(--p);}
+.bt{background:var(--tl);color:var(--t);}
+.ba{background:var(--al);color:var(--a);}
+.bc{background:var(--cl);color:var(--c);}
+.bb{background:var(--bl);color:var(--b);}
+.tag{display:inline-block;background:var(--bg2);border:0.5px solid var(--bd);border-radius:6px;padding:2px 7px;font-size:12px;color:var(--text2);margin:2px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:580px){.grid2{grid-template-columns:1fr;}}
+.hl{border-left:3px solid var(--p);background:var(--pl);border-radius:0 var(--r) var(--r) 0;padding:10px 14px;margin:10px 0;font-size:13px;}
+.hl-t{border-color:var(--t);background:var(--tl);}
+.hl-a{border-color:var(--a);background:var(--al);}
+.hl-c{border-color:var(--c);background:var(--cl);}
+.hl-b{border-color:var(--b);background:var(--bl);}
+.quote{border-left:3px solid var(--a);background:var(--al);border-radius:0 var(--r) var(--r) 0;padding:9px 14px;margin:8px 0;font-size:13px;color:var(--text2);font-style:italic;}
+.flow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:12px 0;}
+.fstep{border-radius:8px;padding:7px 11px;font-size:12px;font-weight:500;}
+.farr{color:var(--text3);font-size:11px;}
+.sdiv{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;padding:8px 0 4px;margin-top:12px;}
+.qa{border-radius:var(--r);border:0.5px solid var(--bd);overflow:hidden;margin-bottom:6px;}
+.qa-q{padding:10px 14px;font-weight:500;font-size:13px;cursor:pointer;user-select:none;}
+.qa-q:hover{background:var(--bg2);}
+.qa-a{padding:10px 14px;border-top:0.5px solid var(--bd);font-size:13px;color:var(--text2);display:none;line-height:1.8;}
+.qa-a.show{display:block;}
+</style>
+</head>
+<body>
+
+<div style="max-width:880px;margin:0 auto;padding:16px 16px 0;">
+  <a href="notes.html" style="display:inline-flex;align-items:center;gap:6px;color:#534AB7;font-size:13px;text-decoration:none;opacity:.7;transition:opacity .2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">
+    <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
+    返回笔记列表
+  </a>
+</div>
+
+<div class="page">
+<h1>🔍 AI大模型评测 · 完整笔记</h1>
+<p class="sub">点击标签切换章节</p>
+
+<div class="nav">
+  <button class="active" onclick="sw('p1')">📌 什么是模型评测</button>
+  <button onclick="sw('p2')">⏰ 评测时机与类别</button>
+  <button onclick="sw('p3')">🔄 标准评测流程</button>
+  <button onclick="sw('p4')">📁 评测集构建</button>
+  <button onclick="sw('p5')">📊 三种评测方法</button>
+  <button onclick="sw('p6')">🛡 置信度策略</button>
+  <button onclick="sw('p7')">📝 评测报告</button>
+  <button onclick="sw('p8')">🏭 工业界案例</button>
+  <button onclick="sw('review')">🎯 面试速查</button>
+</div>
+
+<!-- 第1部分 -->
+<div id="tab-p1" class="sec active">
+  <h2>第一部分 · 什么是模型评测？</h2>
+
+  <div class="hl-b"><strong>官方定义（背下来！）</strong><br>
+    通过「<strong>系统化、客观和全面</strong>」的方法，对大语言模型的性能和质量进行量化和质化分析
+  </div>
+  <div class="card" style="font-size:13px;">💬 用大白话说就是：把同一个问题同时丢给不同模型对比，看哪个回答更好——你已经在做最简单的模型评测了！</div>
+
+  <h3>三个关键词拆解</h3>
+  <table>
+    <tr><th>关键词</th><th>在模型评测里是什么</th><th>核心意义</th></tr>
+    <tr><td><strong>系统化</strong></td><td>提前设计评测框架，不能随便出题</td><td>结果才有代表性</td></tr>
+    <tr><td><strong>客观</strong></td><td>统一评分规则，不因人而异</td><td>可比较、可复现</td></tr>
+    <tr><td><strong>全面</strong></td><td>多维度覆盖，不能只测一种能力</td><td>不漏测关键短板</td></tr>
+  </table>
+
+  <h3>性能 vs 质量</h3>
+  <div class="grid2">
+    <div class="card"><div class="ct">⚡ 性能（硬件素质）</div>回答速度 / 理解能力 / 上下文记忆<br><small style="color:var(--text3)">基础保障，用户感知不明显</small></div>
+    <div class="card"><div class="ct">🎯 质量（核心竞争力）</div>内容准确性 / 逻辑合理性 / 语言流畅度<br><small style="color:var(--text3)"><strong>用户最在乎的！</strong></small></div>
+  </div>
+  <div class="hl-t">💡 传统APP：用户体验 = 交互+视觉。生成式AI：用户体验 = <strong>内容生成质量！</strong>这是根本区别。</div>
+</div>
+
+<!-- 第2部分 -->
+<div id="tab-p2" class="sec">
+  <h2>第二部分 · 什么时候做评测？</h2>
+
+  <div class="flow">
+    <div class="fstep" style="background:var(--pl);color:var(--p);">SFT训练</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--tl);color:var(--t);">内测评测</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--al);color:var(--a);">上线</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--bl);color:var(--b);">公测评测</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--gl);color:var(--g);">持续迭代优化</div>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><div class="ct">🔬 阶段一：训练时（内测）</div>每完成一轮训练就要做<br>目的：趁还没上线，发现问题及时止损</div>
+    <div class="card"><div class="ct">🌐 阶段二：上线后（公测）</div>持续监控稳定性和内容质量<br>收集用户反馈的 Badcase</div>
+  </div>
+  <div class="hl-c">⚠️ 用户反馈的Badcase，有时候是无中生有！<strong>一定要自己先复测一遍</strong>，确认模型真的有这个问题，再交给算法。</div>
+
+  <h3>评测类别全览</h3>
+  <h3 style="font-size:13px;">按模态分类</h3>
+  <table>
+    <tr><th>模态类型</th><th>核心评测维度</th></tr>
+    <tr><td>📝 文本生成</td><td>语法自然度 / 逻辑推理 / 事实准确性 / 幻觉率</td></tr>
+    <tr><td>🖼️ 文生图</td><td>生成质量 / 风格符合度 / 指令遵循度</td></tr>
+    <tr><td>🎬 生成视频</td><td>主体一致性 / 画面连贯性 / 运动轨迹合理性</td></tr>
+    <tr><td>🔊 语音生成</td><td>清晰度 / 语调准确 / 音色一致 / 杂音占比</td></tr>
+  </table>
+  <div class="hl-t">📌 评测维度没有固定标准答案，只要符合业务目标就是对的！面试被问到时这句话很加分。</div>
+</div>
+
+<!-- 第3部分 -->
+<div id="tab-p3" class="sec">
+  <h2>第三部分 · 标准评测流程</h2>
+
+  <div class="flow">
+    <div class="fstep" style="background:var(--cl);color:var(--c);">需求承接</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--bl);color:var(--b);">文档撰写</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--pl);color:var(--p);">评测集构建</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--al);color:var(--a);">执行评测</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--tl);color:var(--t);">撰写报告</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--gl);color:var(--g);">交付算法</div>
+  </div>
+
+  <h3>第一步：需求承接（5W2H框架）</h3>
+  <div class="card" style="font-size:13px;">
+    本次评测目标是什么？（What）/ 为什么要做？（Why）/ 评测哪些模型？（Who）<br>
+    数据类型？（What）/ 数据量？（How many）/ 排期时间？（When）/ 预算？（How much）
+  </div>
+
+  <div class="hl-a">🔑 <strong>数据量行业标准（面试必答）</strong><br>
+    一般企业标准：100~300 条<br>
+    一线互联网（如阿里）：约 150 条<br>
+    行业通用上限：不超过 400 条
+  </div>
+
+  <h3>第二步：评测需求文档结构</h3>
+  <table>
+    <tr><th>文档模块</th><th>重点说明</th></tr>
+    <tr><td>评测背景与目标</td><td>从需求方沟通中提炼，去掉废话留精华</td></tr>
+    <tr><td>评测对象说明 ★重要</td><td><strong>必须写版本号！</strong>同一模型不同版本的结果不通用！</td></tr>
+    <tr><td>评测方案 ★最核心</td><td>评测集+评测方法+标注方式，这是文档的灵魂</td></tr>
+    <tr><td>规则维度标注要求</td><td>每个分值必须有详细说明</td></tr>
+  </table>
+</div>
+
+<!-- 第4部分 -->
+<div id="tab-p4" class="sec">
+  <h2>第四部分 · 评测集构建</h2>
+
+  <h3>三大核心要求（铁律）</h3>
+  <table>
+    <tr><th></th><th>要求</th><th>考试类比/记忆口诀</th></tr>
+    <tr><td>①</td><td><strong>模型没见过（陌生）</strong></td><td>考试不出讲过的原题，只出变形题</td></tr>
+    <tr><td>②</td><td><strong>多维度覆盖</strong></td><td>语数英史地生都要考，不能只测一种</td></tr>
+    <tr><td>③</td><td><strong>不同难度均匀分配</strong></td><td>简单/中等/困难三梯度均匀分布</td></tr>
+  </table>
+
+  <h3>四大来源</h3>
+  <table>
+    <tr><th>来源</th><th>优缺点</th><th>适用条件</th></tr>
+    <tr><td>① 用户Query（打捞）</td><td>✅ 最真实 ❌ 需要筛选</td><td>公司有产品且有用户量</td></tr>
+    <tr><td>② 开源评测集</td><td>✅ 省时省力 ❌ 需判断适用性</td><td>有合适的现成数据</td></tr>
+    <tr><td>③ Prompt构造</td><td>✅ 没有数据时救命 ❌ 需设计规则</td><td>无用户数据也无合适开源集</td></tr>
+    <tr><td>④ 算法直接提供</td><td>✅ 最省力 ❌ 很少发生</td><td>算法团队主动提供</td></tr>
+  </table>
+
+  <h3>Prompt构造法步骤</h3>
+  <div class="flow">
+    <div class="fstep" style="background:var(--pl);color:var(--p);">① 明确评测目标</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--bl);color:var(--b);">② 设计生成规则</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--tl);color:var(--t);">③ 让LLM生成Excel</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--al);color:var(--a);">④ 投喂多个模型对比</div>
+  </div>
+
+  <div class="hl-c">⚠️ <strong>重要：评测集一定要定期收集和更换！</strong>模型能力每个月都在提升，旧题就像用小学题考高中生——白测！</div>
+</div>
+
+<!-- 第5部分 -->
+<div id="tab-p5" class="sec">
+  <h2>第五部分 · 三种评测方法</h2>
+
+  <h3>方法选择决策树</h3>
+  <table>
+    <tr><th>评测需求</th><th>推荐方法</th></tr>
+    <tr><td>快速判断哪个模型更好</td><td><strong>对比法（GSB/SBS）</strong></td></tr>
+    <tr><td>精准定位模型哪里有问题</td><td><strong>评分法（1-5分）</strong></td></tr>
+    <tr><td>事实性验证（对/错类型）</td><td><strong>二值判断法</strong></td></tr>
+    <tr><td>重要项目，需给领导汇报</td><td><strong>混合策略（GSB + 评分法）</strong></td></tr>
+  </table>
+
+  <h3>方法① — GSB对比法</h3>
+  <table>
+    <tr><th>标签</th><th>含义</th><th>计算处理</th></tr>
+    <tr><td><strong>G</strong> - Good</td><td>模型A比模型B好</td><td>✅ 直接计入胜出</td></tr>
+    <tr><td><strong>S</strong> - Same</td><td>两者一样好或一样坏</td><td>⚡ S ÷ 2（取平均）</td></tr>
+    <tr><td><strong>B</strong> - Bad</td><td>模型A比模型B差</td><td>❌ 不计入胜出</td></tr>
+  </table>
+  <div class="hl-a">📐 <strong>GSB 胜率公式：胜率 = ( G + S ÷ 2 ) ÷ 总样本数</strong></div>
+
+  <h3>方法① — SBS对比法（GSB升级版）</h3>
+  <table>
+    <tr><th>A更好</th><th>A好一些</th><th>一样好</th><th>一样差</th><th>B好一些</th><th>B更好</th></tr>
+    <tr><td>+2分</td><td>+1分</td><td>0分</td><td>0分</td><td>-1分</td><td>-2分</td></tr>
+  </table>
+  <div class="card" style="font-size:13px;">💡 GSB vs SBS核心区别：GSB的S不区分好坏要除以2；SBS已明确区分好坏，结果更精准。SBS比GSB多3个维度。</div>
+
+  <h3>方法② — 评分法（1-5分制）</h3>
+  <div class="hl"><strong>核心要求：每个分值后面必须有详细的规则解释！</strong></div>
+  <table>
+    <tr><th>分</th><th>判定标准</th><th>是否满意</th></tr>
+    <tr><td><strong>5</strong></td><td>完全正确，满足所有要求，表达完美</td><td>✅ 满意</td></tr>
+    <tr><td><strong>4</strong></td><td>基本正确，存在小瑕疵但不影响使用</td><td>✅ 满意</td></tr>
+    <tr><td><strong>3</strong></td><td>部分错误（错误&lt;50%），人工稍改可用</td><td>⚠️ 勉强</td></tr>
+    <tr><td><strong>2</strong></td><td>存在明显问题，大量内容不符合要求</td><td>❌ 不满意</td></tr>
+    <tr><td><strong>1</strong></td><td>完全不满足要求，严重幻觉/事实错误</td><td>❌ 不满意</td></tr>
+  </table>
+
+  <h3>三种结果计算方式（组合使用！）</h3>
+  <table>
+    <tr><th></th><th>计算方式</th><th>公式</th><th>用途</th></tr>
+    <tr><td>①</td><td>平均分法</td><td>所有分数之和 ÷ 总样本数</td><td>整体衡量模型质量</td></tr>
+    <tr><td>②</td><td>满意度占比</td><td>（4分+5分数量）÷ 总样本数</td><td>衡量用户满意比例</td></tr>
+    <tr><td>③</td><td>问题占比法</td><td>各类错误数量 ÷ 总样本数</td><td>精准定位：幻觉率/遗漏率/事实错误率</td></tr>
+  </table>
+  <div class="hl-t">💡 评分维度数量控制：<strong>3-5个最佳！</strong>维度太多（10+条）会大幅提高理解成本。</div>
+
+  <h3>方法③ — 二值判断法</h3>
+  <div class="grid2">
+    <div class="card"><div class="ct">✅ 优点</div>极简高效 / 结果明确无歧义 / 数据统计方便 / 适合大批量快速筛查</div>
+    <div class="card"><div class="ct">❌ 缺点</div>无法精准定位具体问题 / 只能告诉你有没有问题 / 不能指导针对性优化</div>
+  </div>
+</div>
+
+<!-- 第6部分 -->
+<div id="tab-p6" class="sec">
+  <h2>第六部分 · 提升评测置信度的策略</h2>
+
+  <h3>混合评测策略</h3>
+  <table>
+    <tr><th>组合方式</th><th>谁看什么</th></tr>
+    <tr><td><strong>GSB + 评分法</strong></td><td>领导看 → GSB胜率结论（直观）<br>算法看 → 评分法问题分析（精准）</td></tr>
+    <tr><td><strong>二值判断 + 评分法</strong></td><td>先二值快速过滤 → 再对剩余样本精细评分</td></tr>
+  </table>
+
+  <h3>双盲评测</h3>
+  <div class="card" style="font-size:13px;">
+    <strong>安排2-3名独立评测人员，分别标注同一条数据，互不影响</strong><br><br>
+    结果一致 → 直接采纳<br>
+    结果不一致 → 组织讨论，规则制定者的结论优先级更高<br><br>
+    为什么有效：单人打分主观性强，多人独立评测消除个人偏差，整体置信度更高
+  </div>
+
+  <h3>评测规则设计</h3>
+  <div class="grid2">
+    <div class="card"><div class="ct">通用规则（所有项目都适用）</div>意图理解能力 / 可读性 / 事实性 / 全面性 / 逻辑性</div>
+    <div class="card"><div class="ct">专项规则（按项目单独制定）</div>根据项目背景单独制定，每个分值必须有判定标准</div>
+  </div>
+</div>
+
+<!-- 第7部分 -->
+<div id="tab-p7" class="sec">
+  <h2>第七部分 · 评测报告撰写</h2>
+
+  <div class="hl-b">🏥 评测报告 = 给模型做体检报告<br>告诉模型：哪里做得好 · 哪里有问题 · 下一版本该补什么营养<br><strong>最终目的：给算法团队下一轮优化指明方向！</strong></div>
+
+  <h3>报告核心结构</h3>
+  <table>
+    <tr><th>顺序</th><th>模块</th><th>重要说明</th></tr>
+    <tr><td>①</td><td>评测基础信息</td><td>评测目的/日期/数据集/评测人员/评分标准</td></tr>
+    <tr><td>②</td><td><strong>核心结论 ⭐最重要！</strong></td><td>模型优点/缺点/与竞品差异/优化建议<br>把数字结果翻译成文字结论</td></tr>
+    <tr><td>③</td><td>具体案例（证据）</td><td>Good case + Bad case，让算法认可你的结论</td></tr>
+  </table>
+
+  <h3>全版 vs 简化版</h3>
+  <div class="grid2">
+    <div class="card"><div class="ct">全面版</div>正常交付 / 重要项目<br>完整呈现：基础信息→各维度数据→结论→good/bad case</div>
+    <div class="card"><div class="ct">简化版</div>紧急交付 / 时间不够<br>结论前置！只保留核心结论+关键数字+典型case</div>
+  </div>
+  <div class="hl-t">🔧 实际工作技巧：不需要从零写！直接复用上一次的模板，稍微修改就能用。</div>
+</div>
+
+<!-- 第8部分 -->
+<div id="tab-p8" class="sec">
+  <h2>第八部分 · 工业界真实案例（阿里通义）</h2>
+
+  <h3>文生图竞品GSB评测</h3>
+  <table>
+    <tr><th>项目要素</th><th>具体内容</th></tr>
+    <tr><td>评测目标</td><td>对比通义万相 vs 豆包/即梦/文心一言的文生图能力差距</td></tr>
+    <tr><td>评测对象</td><td>必须写清楚版本号！同一模型不同版本结果不通用！</td></tr>
+    <tr><td>评测维度</td><td>① 画面质量（0/0.5/1分）② 指令遵循（SBS 6级）</td></tr>
+    <tr><td>真实结论</td><td>⚠️ 如实输出！不能因为是自家模型就改排序，数据要真实可信</td></tr>
+  </table>
+
+  <h3>视频风格化评测集构建规范</h3>
+  <table>
+    <tr><th>构建规范</th><th>具体要求</th></tr>
+    <tr><td>规模</td><td>59种风格 × 每种3条 = 共177条</td></tr>
+    <tr><td>视频来源</td><td>B站/抖音/快手/小红书真实视频 ⚠️ 禁止选AI生成的视频！</td></tr>
+    <tr><td>视频规格</td><td>时长10秒以上，注意横竖屏尺寸</td></tr>
+    <tr><td>难度分层</td><td>简单/中等/困难三梯度均匀分配</td></tr>
+    <tr><td>难度四维度</td><td>① 镜头难度 ② 运动复杂度 ③ 光影复杂度 ④ 显著实体数量</td></tr>
+  </table>
+</div>
+
+<!-- 面试速查 -->
+<div id="tab-review" class="sec">
+  <h2>🎯 面试速查卡</h2>
+
+  <div class="sdiv">12大必背考点</div>
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 模型评测的定义？</div><div class="qa-a">通过系统化、客观和全面的方法，对大语言模型的性能和质量进行量化和质化分析</div></div>
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 什么时候做评测？</div><div class="qa-a">① 训练时（每完成SFT/RLHF/RM都要做）② 上线后（持续监控+Badcase处理）</div></div>
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 评测集三大要求？</div><div class="qa-a">① 模型没见过 ② 多维度覆盖 ③ 不同难度均匀分配</div></div>
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 评测集四大来源？</div><div class="qa-a">用户Query / 开源评测集 / Prompt构造 / 算法提供</div></div>
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 评测数据量标准？</div><div class="qa-a">100~300条（通用）/ 约150条（一线互联网）/ 上限400条，不需要上万条</div></div>
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: GSB计算公式？</div><div class="qa-a">胜率 = (G + S ÷ 2) ÷ 总样本数  ← S除以2因为不知道里面好坏占比</div></div>
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: SBS六级分类？</div><div class="qa-a">A更好/A好一些/一样好/一样差/B好一些/B更好，可转化为+2/+1/0/0/-1/-2分</div></div>
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 评分法三种计算？</div><div class="qa-a">① 平均分法 ② 满意度占比(4+5分) ③ 问题占比(幻觉/遗漏/事实错误)</div></div>
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 评分维度数量？</div><div class="qa-a">控制在3-5个！太多会大幅增加理解成本，降低评测效率</div></div>
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 评测报告三大模块？</div><div class="qa-a">① 基础信息 ② 核心结论（最重要！）③ 具体案例(good/bad case)</div></div>
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 评测集多久更换？</div><div class="qa-a">定期更换！模型能力每月都在提升，用旧题测不出当前真实水平</div></div>
+  <div class="qa"><div class="qa-q" onclick="tq(this)">Q: 标注流程vs评测流程最终交付物？</div><div class="qa-a">标注流程 → 交数据 / 评测流程 → 交评测报告</div></div>
+
+  <div class="sdiv">面试金句</div>
+  <div class="quote">「评测报告的本质就是给模型做体检，告诉它哪里好哪里不好，下一步该补什么营养。」</div>
+  <div class="quote">「评测集一定要定期更换，用小学题考高中生，测不出真实水平。」</div>
+  <div class="quote">「评测维度没有固定答案，只要符合项目需求就是对的。」</div>
+  <div class="quote">「实际工作不用从零构建文档，直接套模板改，大部分内容AI辅助写，没必要全手动敲。」</div>
+
+  <div class="sdiv">核心词汇速查</div>
+  <table>
+    <tr><th>术语</th><th>解释</th></tr>
+    <tr><td>Badcase</td><td>用户反馈的模型错误案例。不能直接信！先自己复测</td></tr>
+    <tr><td>SFT</td><td>监督微调，模型训练核心阶段，数据量上万条</td></tr>
+    <tr><td>RLHF</td><td>基于人类反馈的强化学习</td></tr>
+    <tr><td>GSB</td><td>Good/Same/Bad 三级对比法。胜率=(G+S/2)/总量</td></tr>
+    <tr><td>SBS</td><td>Side-by-Side 六级精细化对比，比GSB多3个维度</td></tr>
+    <tr><td>RAG</td><td>检索增强生成，知识库功能的核心技术</td></tr>
+    <tr><td>COT</td><td>思维链，测逻辑推理过程是否合理</td></tr>
+  </table>
+</div>
+
+</div>
+<script>
+function sw(n){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
+  event.target.classList.add('active');
+}
+function tq(el){el.nextElementSibling.classList.toggle('show');}
+</script>
+</body>
+</html>

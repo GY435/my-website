@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多模态AI数据标注 · 我的笔记</title>
+<style>
+:root{
+  --p:#534AB7;--pl:#EEEDFE;--pm:#7F77DD;
+  --t:#1D9E75;--tl:#E1F5EE;--tm:#5DCAA5;
+  --a:#BA7517;--al:#FAEEDA;--am:#EF9F27;
+  --c:#993C1D;--cl:#FAECE7;--cm:#D85A30;
+  --b:#185FA5;--bl:#E6F1FB;--bm:#378ADD;
+  --g:#5F5E5A;--gl:#F1EFE8;--gm:#888780;
+  --text:#2C2C2A;--text2:#5F5E5A;--text3:#888780;
+  --bg:#fff;--bg2:#F1EFE8;--bd:rgba(44,44,42,0.15);
+  --r:10px;--rl:16px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --text:#e8e6de;--text2:#b4b2a9;--text3:#888780;
+  --bg:#1e1e1c;--bg2:#2c2c2a;--bd:rgba(255,255,255,0.12);
+  --p:#AFA9EC;--pl:#26215C;--pm:#7F77DD;
+  --t:#5DCAA5;--tl:#04342C;--tm:#1D9E75;
+  --a:#EF9F27;--al:#412402;--am:#BA7517;
+  --c:#F0997B;--cl:#4A1B0C;--cm:#D85A30;
+  --b:#85B7EB;--bl:#042C53;--bm:#378ADD;
+  --g:#B4B2A9;--gl:#2C2C2A;--gm:#5F5E5A;
+}}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.65;}
+.page{max-width:880px;margin:0 auto;padding:24px 16px 70px;}
+h1{font-size:22px;font-weight:500;margin-bottom:4px;}
+h2{font-size:17px;font-weight:500;margin:26px 0 10px;}
+h3{font-size:14px;font-weight:500;margin:14px 0 7px;}
+p.sub{font-size:13px;color:var(--text3);margin-bottom:20px;}
+.nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:24px;border-bottom:0.5px solid var(--bd);padding-bottom:12px;}
+.nav button{border:0.5px solid var(--bd);background:transparent;color:var(--text2);border-radius:20px;padding:5px 13px;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.nav button:hover{background:var(--bg2);}
+.nav button.active{background:var(--pl);border-color:var(--pm);color:var(--p);font-weight:500;}
+.sec{display:none;}.sec.active{display:block;}
+.card{background:var(--bg2);border-radius:var(--r);padding:14px;margin-bottom:10px;border:0.5px solid var(--bd);}
+.ct{font-size:11px;font-weight:500;color:var(--text3);margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--bg2);padding:8px 10px;text-align:left;font-weight:500;color:var(--text2);border-bottom:0.5px solid var(--bd);}
+td{padding:8px 10px;border-bottom:0.5px solid var(--bd);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500;}
+.bp{background:var(--pl);color:var(--p);}
+.bt{background:var(--tl);color:var(--t);}
+.ba{background:var(--al);color:var(--a);}
+.bc{background:var(--cl);color:var(--c);}
+.bb{background:var(--bl);color:var(--b);}
+.tag{display:inline-block;background:var(--bg2);border:0.5px solid var(--bd);border-radius:6px;padding:2px 7px;font-size:12px;color:var(--text2);margin:2px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+@media(max-width:580px){.grid2,.grid3{grid-template-columns:1fr;}}
+.hl{border-left:3px solid var(--p);background:var(--pl);border-radius:0 var(--r) var(--r) 0;padding:10px 14px;margin:10px 0;font-size:13px;}
+.hl-t{border-color:var(--t);background:var(--tl);}
+.hl-a{border-color:var(--a);background:var(--al);}
+.hl-c{border-color:var(--c);background:var(--cl);}
+.hl-b{border-color:var(--b);background:var(--bl);}
+.quote{border-left:3px solid var(--a);background:var(--al);border-radius:0 var(--r) var(--r) 0;padding:9px 14px;margin:8px 0;font-size:13px;color:var(--text2);font-style:italic;}
+.flow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:12px 0;}
+.fstep{border-radius:8px;padding:7px 11px;font-size:12px;font-weight:500;}
+.farr{color:var(--text3);font-size:11px;}
+.acc{border-radius:var(--r);border:0.5px solid var(--bd);overflow:hidden;margin-bottom:8px;}
+.acc-hd{padding:10px 14px;font-weight:500;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;}
+.acc-bd{padding:12px 14px;border-top:0.5px solid var(--bd);display:none;}
+.acc-bd.open{display:block;}
+.acc-ic{font-size:11px;color:var(--text3);transition:transform .2s;}
+.acc-ic.open{transform:rotate(90deg);}
+.sdiv{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;padding:8px 0 4px;margin-top:12px;}
+.qa{border-radius:var(--r);border:0.5px solid var(--bd);overflow:hidden;margin-bottom:6px;}
+.qa-q{padding:10px 14px;font-weight:500;font-size:13px;cursor:pointer;user-select:none;}
+.qa-q:hover{background:var(--bg2);}
+.qa-a{padding:10px 14px;border-top:0.5px solid var(--bd);font-size:13px;color:var(--text2);display:none;line-height:1.8;}
+.qa-a.show{display:block;}
+</style>
+</head>
+<body>
+
+<div style="max-width:880px;margin:0 auto;padding:16px 16px 0;">
+  <a href="notes.html" style="display:inline-flex;align-items:center;gap:6px;color:#534AB7;font-size:13px;text-decoration:none;opacity:.7;transition:opacity .2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">
+    <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
+    返回笔记列表
+  </a>
+</div>
+
+<div class="page">
+<h1>🎨 多模态AI数据标注 · 完整笔记</h1>
+<p class="sub">点击标签切换章节</p>
+
+<div class="nav">
+  <button class="active" onclick="sw('ch1')">🧠 多模态基础</button>
+  <button onclick="sw('ch2')">🖼 生图技术原理</button>
+  <button onclick="sw('ch3')">🎯 文生图项目</button>
+  <button onclick="sw('ch4')">🏷 图片标注规则</button>
+  <button onclick="sw('ch5')">📝 图文视频标注</button>
+  <button onclick="sw('ch6')">👁 VLM项目</button>
+  <button onclick="sw('ch7')">🔊 ASR语音识别</button>
+  <button onclick="sw('ch8')">🗣 TTS文字转语音</button>
+  <button onclick="sw('ch9')">💼 评测与求职</button>
+  <button onclick="sw('review')">⚡ 速查表</button>
+</div>
+
+<!-- ══ 第一章 ══ -->
+<div id="tab-ch1" class="sec active">
+  <h2>第一章 · 多模态AI基础</h2>
+
+  <div class="hl-b" style="background:var(--bl);border-color:var(--b);margin-bottom:12px;">
+    <strong>官方定义：</strong>多模态（Multi-modality）是集成和处理<strong>两种或两种以上</strong>不同类型信息数据的技术方法。<br>
+    ⚡ <strong>记忆口诀：只要整合「两种及以上」信息形态 = 多模态！OCR 也属于多模态！</strong>
+  </div>
+
+  <h3>多模态 vs 单模态</h3>
+  <table>
+    <tr><th>维度</th><th>🌈 多模态AI</th><th>⚪ 单模态AI</th></tr>
+    <tr><td>输入</td><td>同时输入文本+图像+语音等多类型数据</td><td>仅输入单一模态数据</td></tr>
+    <tr><td>输出</td><td>融合结果（如带有旁白的视频）</td><td>对应单一任务结果</td></tr>
+    <tr><td>典型示例</td><td>输入描述文字，生成对应视频内容</td><td>文本做翻译、图像目标检测</td></tr>
+    <tr><td>核心优势</td><td>综合多模态信息，实现跨领域复杂任务</td><td>专注特定领域，单任务效率高</td></tr>
+  </table>
+
+  <h3>多模态五大核心优势</h3>
+  <div class="card">① 更接近人类认知 → ② 更丰富的数据维度 → ③ 更广泛的应用场景 → ④ 提升AI系统整体能力 → ⑤ 通向通用人工智能（AGI）</div>
+
+  <h3>模态交互类型</h3>
+  <table>
+    <tr><th>模态组合</th><th>代表产品/场景</th><th>方向</th></tr>
+    <tr><td>📝 文本 + 🖼 图片</td><td>DALL·E、Stable Diffusion</td><td>→ 文生图</td></tr>
+    <tr><td>📝 文本 + 🎬 视频</td><td>Sora</td><td>→ 文生视频</td></tr>
+    <tr><td>📝 文本 + 🔊 语音</td><td>TTS系统、音色克隆</td><td>→ 文生语音</td></tr>
+    <tr><td>🖼 图片 + 🎬 视频</td><td>图生视频系统</td><td>→ 图片生视频</td></tr>
+  </table>
+
+  <h3>VLA架构 — 多模态典型应用</h3>
+  <div class="flow">
+    <div class="fstep" style="background:var(--bl);color:var(--b);">👁 V = Vision 视觉感知</div>
+    <div class="farr">→</div>
+    <div class="fstep" style="background:var(--pl);color:var(--p);">🧠 L = LLM 理解决策</div>
+    <div class="farr">→</div>
+    <div class="fstep" style="background:var(--tl);color:var(--t);">⚡ A = Action 动作执行</div>
+  </div>
+  <div class="hl-a">自动驾驶分级必背：L1/L2 需人类参与 → L3 不需操作但需监管 → <strong>L4 完全不需要人类干预 ✅</strong></div>
+</div>
+
+<!-- ══ 第二章 ══ -->
+<div id="tab-ch2" class="sec">
+  <h2>第二章 · AI生图扩散模型技术原理</h2>
+
+  <h3>生成模型三代演进</h3>
+  <table>
+    <tr><th>代际</th><th>模型</th><th>状态</th></tr>
+    <tr><td>第一代</td><td>GAN 生成对抗网络：双模型博弈</td><td><span class="badge bc">❌ 已淘汰</span></td></tr>
+    <tr><td>第二代</td><td>自回归生成模型：图像拆分像素块逐块预测</td><td><span class="badge ba">⚠️ 效果有限</span></td></tr>
+    <tr><td>第三代</td><td>扩散模型 Diffusion Model：从纯噪声逐步去除噪声</td><td><span class="badge bt">✅ 当前主流</span></td></tr>
+  </table>
+
+  <div class="hl-t">💧 扩散模型名称由来：如同把墨水滴入水中慢慢「扩散」——是这个过程的<strong>逆向操作</strong>：从混沌（噪声）恢复清晰（图像）。</div>
+
+  <h3>扩散模型三步核心流程</h3>
+  <div class="flow">
+    <div class="fstep" style="background:var(--bl);color:var(--b);">Step1 CLIP<br><small>文本-图像语义对齐</small></div>
+    <div class="farr">→</div>
+    <div class="fstep" style="background:var(--pl);color:var(--p);">Step2 U-Net<br><small>扩散降噪生成</small></div>
+    <div class="farr">→</div>
+    <div class="fstep" style="background:var(--tl);color:var(--t);">Step3 VAE<br><small>解码放大输出</small></div>
+  </div>
+
+  <h3>三种降噪方式</h3>
+  <table>
+    <tr><th>降噪方式</th><th>核心思路</th><th>说明</th></tr>
+    <tr><td>① 预测噪声均值</td><td>预测需要减去多少噪声的「均值」</td><td>最早期方法，DDPM采用</td></tr>
+    <tr><td>② 直接生成原始图像</td><td>直接预测最终目标图像</td><td>训练难度大</td></tr>
+    <tr><td>③ 预测噪声差值</td><td>预测噪声图与目标图像的「差值」</td><td><strong>现代主流方案，效果最稳定</strong></td></tr>
+  </table>
+
+  <div class="hl">🔄 正向 vs 反向口诀：正向训练 = 往真实图像里「加噪声」→ 反向生成 = 从雪花屏出发一步步「减噪声」</div>
+</div>
+
+<!-- ══ 第三章 ══ -->
+<div id="tab-ch3" class="sec">
+  <h2>第三章 · 文生图项目实战</h2>
+
+  <h3>项目完整流程</h3>
+  <div class="flow">
+    <div class="fstep" style="background:var(--cl);color:var(--c);">🔍 ① 数据筛选</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--bl);color:var(--b);">🗂 ② 数据分类</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--pl);color:var(--p);">✏️ ③ Caption描述</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--gl);color:var(--g);">🤖 ④ 模型训练</div><div class="farr">→</div>
+    <div class="fstep" style="background:var(--tl);color:var(--t);">📊 ⑤ 数据评测</div>
+  </div>
+  <div class="hl-c"><strong>核心原则：想让模型生成什么内容，就投喂什么内容的训练数据！</strong></div>
+
+  <h3>图片基础质量筛选规则（7条铁律）</h3>
+  <table>
+    <tr><th>序号</th><th>规则类型</th><th>判断标准</th><th>处理</th></tr>
+    <tr><td>1</td><td>🚨 安全性违规</td><td>含血腥/暴力/涉政/违法内容</td><td><strong>直接跳过</strong></td></tr>
+    <tr><td>2</td><td>💧 明显水印</td><td>超过画面5%面积的水印</td><td>跳过</td></tr>
+    <tr><td>3</td><td>📐 画面异常</td><td>带黑白边框/明显截图内容</td><td>直接跳过</td></tr>
+    <tr><td>4</td><td>🔲 多图违规</td><td>多图拼贴/图中图/手机截屏</td><td>直接跳过</td></tr>
+    <tr><td>5</td><td>🌫 图片模糊</td><td>清晰度低，边缘锯齿状</td><td>直接跳过</td></tr>
+    <tr><td>6</td><td>☀️ 曝光异常</td><td>过曝（太白）或过暗（太黑）</td><td>直接跳过</td></tr>
+    <tr><td>7</td><td>🎭 无美感/构图</td><td>随机拍摄，无美感无合理构图</td><td>直接跳过</td></tr>
+    <tr><td>✓</td><td>🤖 AI生成图片</td><td>优质图片无论是否AI生成</td><td><strong>✅ 可以使用</strong></td></tr>
+  </table>
+
+  <h3>Caption数据描述框架</h3>
+  <div class="grid2">
+    <div class="card"><div class="ct">📷 内容层（肉眼可见）</div>描述画面中所有可见元素：人物主体、背景、细节</div>
+    <div class="card"><div class="ct">🎨 艺术层（艺术特征）</div>描述色相、饱和度、构图方式等艺术元素</div>
+  </div>
+
+  <h3>Prompt扩写项目</h3>
+  <div class="hl-b">「生成一只猫」→「一只白色布偶猫，在温馨卧室，整体偏暖色，左侧逆光，高饱和度，宫崎骏动画风格」<br>判断扩写好坏：用原始Prompt生图 vs 扩写后生图，哪个更好 = 扩写有效！</div>
+</div>
+
+<!-- ══ 第四章 ══ -->
+<div id="tab-ch4" class="sec">
+  <h2>第四章 · AI图像训练项目标注规则</h2>
+  <div class="hl">💼 <strong>「标签挂载」= 行业通用专业黑话，面试中使用大幅提升专业感！</strong></div>
+
+  <h3>① 色调标签</h3>
+  <table>
+    <tr><th>标签</th><th>颜色范围</th><th>🎯 判定口诀</th></tr>
+    <tr><td>🌅 暖色调</td><td>红、橙、黄及变体</td><td>偏红/橙/黄 = 暖</td></tr>
+    <tr><td>🌊 冷色调</td><td>蓝、绿、紫及变体</td><td>偏蓝/绿/紫 = 冷</td></tr>
+    <tr><td>🌫 低饱和度</td><td>色彩柔和、对比度低</td><td><strong>灰不拉几、不刺眼 = 低饱和</strong></td></tr>
+    <tr><td>✨ 高饱和度</td><td>色彩鲜艳、对比度高</td><td><strong>看起来刺眼 = 高饱和</strong></td></tr>
+  </table>
+
+  <h3>② 角度标签</h3>
+  <table>
+    <tr><th>标签</th><th>拍摄方式</th><th>记忆联想</th></tr>
+    <tr><td>📷 平拍</td><td>与主体处于同一平行高度</td><td>=人正常看东西</td></tr>
+    <tr><td>⬆ 仰拍</td><td>从下向上拍摄</td><td>=仰望英雄</td></tr>
+    <tr><td>⬇ 俯拍</td><td>从上向下拍摄</td><td>=上帝视角</td></tr>
+  </table>
+
+  <h3>③ 构图标签（允许多选！）</h3>
+  <table>
+    <tr><th>构图类型</th><th>判定规则</th></tr>
+    <tr><td>↔ 对称构图</td><td>画面整体左右对称</td></tr>
+    <tr><td>⟺ 三分线构图</td><td>海/地平线沿三分线分布</td></tr>
+    <tr><td>✦ 三分点构图</td><td>主体位于三分线交点处</td></tr>
+    <tr><td>⊙ 中心构图</td><td>主体放置在画面正中心</td></tr>
+    <tr><td>╲ 对角线构图</td><td>左上到右下/左下到右上的对角线趋势</td></tr>
+    <tr><td>— 水平线构图</td><td>存在海平线、地平线等水平分割线</td></tr>
+  </table>
+
+  <h3>④ 景别标签</h3>
+  <table>
+    <tr><th>景别</th><th>展示范围</th><th>记忆方法</th></tr>
+    <tr><td>🏔 大远景</td><td>整座山/整片建筑群，人物极小</td><td>小蚂蚁一样</td></tr>
+    <tr><td>🌄 远景</td><td>人物仅为轮廓，以环境为主</td><td>能看出是人但很小</td></tr>
+    <tr><td>🧍 全景</td><td>展示人物全身</td><td>全身照</td></tr>
+    <tr><td>👔 中景</td><td>展示膝盖及以上</td><td>半身照</td></tr>
+    <tr><td>👤 近景</td><td>展示胸部以上</td><td>证件照感</td></tr>
+    <tr><td>👁 特写</td><td>仅眼睛/手/嘴巴等局部细节</td><td>眼睛的特写</td></tr>
+  </table>
+
+  <h3>⑤ 光影标签</h3>
+  <table>
+    <tr><th>维度</th><th>子类</th><th>判定方法</th></tr>
+    <tr><td>光源类型</td><td>☀️ 自然光</td><td>太阳光等自然界光源</td></tr>
+    <tr><td>光源类型</td><td>💡 人造光</td><td>室内灯光；赛博朋克=典型人造光</td></tr>
+    <tr><td>光质</td><td>🔆 硬光</td><td>明暗交界线锐利清晰 → 硬光</td></tr>
+    <tr><td>光质</td><td>🌤 软光</td><td>明暗交界线柔和有过渡 → 软光</td></tr>
+  </table>
+  <div class="hl-a">🎯 <strong>光位方向争议考点（高频面试题）：</strong><br>一般光位 → 以观察者（标注者）看到的左右为准<br>人物器官（左眼/右手等）→ 以被拍摄人物自身左右为准（与观察者方向完全相反！）</div>
+</div>
+
+<!-- ══ 第五章 ══ -->
+<div id="tab-ch5" class="sec">
+  <h2>第五章 · AI图文视频数据标注规则</h2>
+
+  <h3>图片描述标准框架（必背！）</h3>
+  <div class="hl"><strong>【主体描述】 + 【修饰词】 + 【细节补充】 + 【风格/艺术形式】</strong></div>
+  <table>
+    <tr><th>模块</th><th>核心要求</th><th>示例</th></tr>
+    <tr><td>① 主体描述</td><td>明确核心主体+场景，禁止模糊词汇</td><td>✅ 一位舞者在沙漠中央 ❌ 人在跳舞</td></tr>
+    <tr><td>② 修饰词</td><td>装饰元素/衣服/表情/动作/材质质感</td><td>柔软棉质粉色上衣、灿烂笑容</td></tr>
+    <tr><td>③ 细节补充</td><td>构图/色彩/光影/特殊效果</td><td>三角构图、暖色调、左上侧光</td></tr>
+    <tr><td>④ 风格/艺术形式</td><td>艺术流派或技术参数</td><td>现代商业摄影 / 3D渲染/8K</td></tr>
+  </table>
+
+  <h3>人机协同标注方案</h3>
+  <div class="hl-t">🚀 核心流程：大模型预生成描述 → 人工校验改写补充<br>📊 效率：人工单条≈20~30分钟 → 人机协同后≈5~6分钟（<strong>效率提升约5倍！</strong>）</div>
+
+  <h3>视频标注：低质量判断规则（视频独有）</h3>
+  <table>
+    <tr><th>序号</th><th>规则</th><th>类型</th></tr>
+    <tr><td>1-6</td><td>安全/水印/画面/模糊/曝光/美感（同图片规则）</td><td>图片规则共用</td></tr>
+    <tr><td>7</td><td>⚡ 视频不流畅：掉帧/卡顿/静止/频繁切换镜头</td><td><strong>视频独有！</strong></td></tr>
+    <tr><td>8</td><td>⚡ 全为文字：只有文字内容，无实际画面</td><td><strong>视频独有！</strong></td></tr>
+  </table>
+
+  <h3>视频描述新增3个维度</h3>
+  <table>
+    <tr><th>新增维度</th><th>说明</th></tr>
+    <tr><td>⚡ 前后帧一致性</td><td>人物身份/物体属性在不同帧是否保持一致</td></tr>
+    <tr><td>⚡ 物理常识正确性</td><td>内容是否符合现实物理规律与空间逻辑</td></tr>
+    <tr><td>⚡ 镜头运动标注</td><td>标注镜头类型：推拉摇移/平移/跟镜头/升降</td></tr>
+  </table>
+</div>
+
+<!-- ══ 第六章 ══ -->
+<div id="tab-ch6" class="sec">
+  <h2>第六章 · 多模态VLM项目</h2>
+  <div class="hl-b"><strong>VLM = Vision Language Model（视觉语言模型）</strong><br>让模型从图像/音频/视频等多源输入中提取信息，将视觉信息转化为文本输出。<br>✅ 特点：<strong>门槛低、应用广，是当前求职热门项目方向！</strong></div>
+
+  <h3>STEP 01 — 数据有效性判断（6种无效情况）</h3>
+  <table>
+    <tr><th>序号</th><th>无效原因</th><th>具体情况</th></tr>
+    <tr><td>1</td><td>🖼 图片质量问题</td><td>无图片/图片过于模糊</td></tr>
+    <tr><td>2</td><td>🤖 模型能力边界</td><td>要求编辑图片/发布内容到社交平台</td></tr>
+    <tr><td>3</td><td>🎰 预测类限制</td><td>赌博/彩票/股票趋势等无规律预测</td></tr>
+    <tr><td>4</td><td>❓ 无关联内容</td><td>提问与图片内容完全无关</td></tr>
+    <tr><td>5</td><td>🚫 敏感内容</td><td>色情/暴力/政治敏感等违规内容</td></tr>
+    <tr><td>6</td><td>📐 专业领域限制</td><td>极高难度数学/物理/代码/金融题</td></tr>
+  </table>
+
+  <h3>STEP 02 — 答案正确性判断（4种错误类型）</h3>
+  <div class="hl-t">🎯 <strong>唯一准则：将模型回复修改至「正确、较完美」即可，没有额外复杂规则！</strong></div>
+  <table>
+    <tr><th>错误类型</th><th>处理方式</th></tr>
+    <tr><td>🖼 图片信息描述错误</td><td>改写为准确的图片内容描述</td></tr>
+    <tr><td>✍ 内容质量问题（错别字/逻辑不通）</td><td>校对修正文字质量</td></tr>
+    <tr><td>❌ 答案错误</td><td>查阅资料改写为正确答案</td></tr>
+    <tr><td>📋 格式错误</td><td>重新格式化，提升可读性</td></tr>
+  </table>
+</div>
+
+<!-- ══ 第七章 ══ -->
+<div id="tab-ch7" class="sec">
+  <h2>第七章 · 语音识别（ASR）项目</h2>
+
+  <div class="grid2" style="margin-bottom:12px;">
+    <div class="card"><div class="ct">ASR</div><strong>Automatic Speech Recognition</strong><br>语音→文字<br>智能客服/车载语音/视频字幕</div>
+    <div class="card"><div class="ct">TTS</div><strong>Text-to-Speech</strong><br>文字→语音<br>音色克隆/AI配音/有声书</div>
+  </div>
+
+  <div class="hl-c">🎯 <strong>ASR精度标准（必背！）</strong><br>
+    训练集：字准 ≥ 97%<br>
+    测试集：字准 ≥ 99% / 句准 ≥ 95%
+  </div>
+
+  <h3>ASR有效性判断（10种无效情况）</h3>
+  <table>
+    <tr><th>无效类别</th><th>判定标准</th></tr>
+    <tr><td>❌ 无音频</td><td>文件中没有任何音频内容</td></tr>
+    <tr><td>📢 噪声太大</td><td>背景噪声影响主体发音识别</td></tr>
+    <tr><td>🔇 发音模糊</td><td>听不清楚内容，无法识别</td></tr>
+    <tr><td>🗣 无法识别的方言</td><td>包含项目范围外的方言</td></tr>
+    <tr><td>👥 多人同时讲话</td><td>声音重叠，无法分辨</td></tr>
+    <tr><td>✂️ 音频不完整</td><td>说到一半断掉，内容不完整</td></tr>
+    <tr><td>🌍 包含小语种</td><td>出现非目标语言的小语种</td></tr>
+    <tr><td>😂 仅非语音事件</td><td>只有大笑/咳嗽/哭声，无语言内容</td></tr>
+    <tr><td>🤖 人工合成/电子音</td><td>非真人发音</td></tr>
+    <tr><td>🎵 混合背景音</td><td>人声+音乐/其他背景音同时存在</td></tr>
+  </table>
+
+  <h3>ASR准确转写规则（11条）</h3>
+  <div class="hl-c"><strong>❗ 最重要铁律：不允许添加任何标点符号！！！</strong></div>
+  <table>
+    <tr><th>序号</th><th>规则</th><th>示例/说明</th></tr>
+    <tr><td>1</td><td>听到什么标注什么，不省略不增删</td><td>重复内容原样保留</td></tr>
+    <tr><td>2</td><td>❌ 不允许添加任何标点符号</td><td>包括逗号/句号/感叹号/问号</td></tr>
+    <tr><td>3</td><td>语气词使用带口字旁的汉字</td><td>啊/呢/呀/哦/嗯</td></tr>
+    <tr><td>4</td><td>人名/地名/专有名词需核对正确性</td><td>华谊（不是华宜）</td></tr>
+    <tr><td>5</td><td>网络用语按实际发音转写为汉字</td><td>灰常=非常 / 童鞋=同学</td></tr>
+    <tr><td>6</td><td>数字按照发音转写为汉字</td><td>1341639 → 幺三四幺六三九</td></tr>
+    <tr><td>7</td><td>英文全部转为大写</td><td>app → APP / iPhone → IPHONE</td></tr>
+    <tr><td>8</td><td>网址/专业名词按发音如实转写</td><td>http → HTTP冒号双斜杠WWW点</td></tr>
+    <tr><td>9</td><td>儿化音需要添加儿字</td><td>花儿 / 头儿 / 标签儿</td></tr>
+    <tr><td>10</td><td>拟声词需要如实转写</td><td>风刮得呼呼的 / 嘭的一声</td></tr>
+    <tr><td>11</td><td>多义词结合上下文判断</td><td>五月（月份）vs 五月（人名）</td></tr>
+  </table>
+</div>
+
+<!-- ══ 第八章 ══ -->
+<div id="tab-ch8" class="sec">
+  <h2>第八章 · 文本转语音（TTS）项目</h2>
+  <div class="hl-c">🔥 <strong>重要：未经精细标注的数据会导致超过30%的合成语音不自然！标注精细度直接决定合成效果！</strong></div>
+
+  <h3>TTS拼音标注规则</h3>
+  <table>
+    <tr><th>规则</th><th>说明</th></tr>
+    <tr><td>逐字校正拼音</td><td>错误拼音需标红改写，多音字结合语境确定读音</td></tr>
+    <tr><td>ü 用 v 代替</td><td>女 → nv3 / 鱼 → yv2 / 韵律 → yv4nv4</td></tr>
+    <tr><td>声调标注方式</td><td>拼音后标数字：1=一声 / 2=二声 / 3=三声 / 4=四声</td></tr>
+  </table>
+
+  <h3>轻声规则（标记为5）</h3>
+  <table>
+    <tr><th>轻声场景</th><th>示例</th></tr>
+    <tr><td>🔁 叠词的第二个字</td><td>妈妈(ma1 ma5) / 哥哥 / 宝宝</td></tr>
+    <tr><td>💬 句尾语气助词</td><td>行吗(ma5) / 好吗 / 了 / 着</td></tr>
+    <tr><td>📝 名词代词后缀（子/头）</td><td>石头(tou5) / 儿子(zi5)</td></tr>
+    <tr><td>👁 人体部位名词第二字</td><td>鼻子(zi5) / 耳朵(duo5)</td></tr>
+    <tr><td>📍 名词后方向词</td><td>墙上(shang5) / 左边</td></tr>
+    <tr><td>🏃 动词趋势补语</td><td>拿来(lai5) / 坐下(xia5)</td></tr>
+  </table>
+
+  <h3>三三变调规则（标记为6）★★★</h3>
+  <div class="hl-a"><strong>核心规则：连续两个三声，第一个三声变调为二声，变调后标记为「6」</strong><br>
+    例：你好(ni6 hao3) / 雨伞(yu6 san3) / 演讲稿(yan6 jiang6 gao3)
+  </div>
+  <table>
+    <tr><th>结构类型</th><th>规则</th><th>示例</th></tr>
+    <tr><td>单音节 + 双音节</td><td>双音节第一个三声变二声，标6</td><td>打(da3) 雨(yu6) 伞(san3)</td></tr>
+    <tr><td>双音节 + 单音节</td><td>前两个三声都变二声，都标6</td><td>演(yan6) 讲(jiang6) 稿(gao3)</td></tr>
+    <tr><td>单+单+单音节</td><td>前两个三声都变二声，都标6</td><td>你(ni6) 打(da6) 我(wo3)</td></tr>
+  </table>
+
+  <h3>TTS声调体系总览</h3>
+  <table>
+    <tr><th>数字标记</th><th>含义</th><th>典型场景</th></tr>
+    <tr><td>1~4</td><td>一到四声</td><td>普通声调字</td></tr>
+    <tr><td>5</td><td><strong>轻声</strong></td><td>叠词第二字/语气助词/名词后缀等</td></tr>
+    <tr><td>6</td><td><strong>变调后的三声（必考！）</strong></td><td>三三变调中第一个三声：雨yu6 / 你ni6</td></tr>
+  </table>
+</div>
+
+<!-- ══ 第九章 ══ -->
+<div id="tab-ch9" class="sec">
+  <h2>第九章 · 评测项目与求职建议</h2>
+
+  <h3>评测项目安排</h3>
+  <div class="hl">评测 = 模型的「考试」：投喂优质数据训练后，必须进行评测。某类效果不合格 → 针对性补充数据 → 重新训练（循环迭代）</div>
+  <table>
+    <tr><th>评测类型</th><th>触发时机</th><th>说明</th></tr>
+    <tr><td>小版本评测</td><td>每次小版本迭代后</td><td>快速验证改动效果，定向找短板</td></tr>
+    <tr><td>大版本评测</td><td>大版本更新后</td><td>全面评测各维度能力</td></tr>
+    <tr><td>上线前评测</td><td>产品正式上线前</td><td>确保质量达标，避免线上事故</td></tr>
+    <tr><td>上线后评测</td><td>产品上线后持续监控</td><td>发现新问题，持续优化</td></tr>
+  </table>
+
+  <h3>行业求职建议</h3>
+  <table>
+    <tr><th>项目方向</th><th>门槛</th><th>优势条件</th><th>就业前景</th></tr>
+    <tr><td>VLM图像理解</td><td>低</td><td>所有专业背景均可</td><td>热门，适合作为面试项目</td></tr>
+    <tr><td>ASR语音识别</td><td>中</td><td>有音乐基础/耳朵好/有方言</td><td>需求大，大厂大力招聘</td></tr>
+    <tr><td>TTS文本转语音</td><td>中高</td><td>语言学/音乐/播音背景</td><td>音色克隆方向前景好</td></tr>
+    <tr><td>方言标注</td><td>低</td><td>有特定方言（粤/川/豫等）</td><td>非常紧缺，竞争少</td></tr>
+    <tr><td>小语种标注</td><td>高</td><td>掌握小语种（日韩法德等）</td><td>单价高，需求持续增长</td></tr>
+    <tr><td>3D标注</td><td>中高</td><td>有3D建模/动画背景</td><td>新兴领域，竞争较少</td></tr>
+  </table>
+</div>
+
+<!-- ══ 速查表 ══ -->
+<div id="tab-review" class="sec">
+  <h2>⚡ 终极速查表</h2>
+
+  <div class="sdiv">多模态核心考点</div>
+  <table>
+    <tr><th>考点</th><th>核心内容</th></tr>
+    <tr><td>多模态定义</td><td>整合两种及以上信息形态 = 多模态。OCR也属于多模态！</td></tr>
+    <tr><td>扩散模型三步</td><td>CLIP（对齐）→ U-Net（去噪）→ VAE（放大）</td></tr>
+    <tr><td>三种降噪方式</td><td>①预测噪声均值 ②直接生成原始图像 ③预测噪声差值（现代主流）</td></tr>
+    <tr><td>VLA架构</td><td>V视觉感知 → L大模型决策 → A动作执行</td></tr>
+    <tr><td>L4自动驾驶</td><td>完全不需要人类干预</td></tr>
+  </table>
+
+  <div class="sdiv">图像标签速查</div>
+  <table>
+    <tr><th>标签类别</th><th>快速判定口诀</th></tr>
+    <tr><td>色调</td><td>刺眼=高饱和 / 灰调=低饱和 / 偏红橙黄=暖 / 偏蓝绿紫=冷</td></tr>
+    <tr><td>角度</td><td>与主体平行=平 / 从下往上=仰 / 从上往下=俯</td></tr>
+    <tr><td>构图</td><td>可多选！主体在中=中心构图</td></tr>
+    <tr><td>景别</td><td>全身=全景 / 膝盖以上=中景 / 胸以上=近景 / 局部=特写</td></tr>
+    <tr><td>光影</td><td>明暗交界线锐利=硬光 / 光位以观察者视角为准（器官除外）</td></tr>
+  </table>
+
+  <div class="sdiv">ASR转写速查</div>
+  <div class="hl-c"><strong>❗ 最重要铁律：不允许添加任何标点符号！</strong><br>
+    精度：训练集字准≥97% / 测试集字准≥99% / 句准≥95%<br>
+    特殊格式：语气词加口字旁 / 数字转汉字 / 英文全大写 / 儿化音加儿字
+  </div>
+
+  <div class="sdiv">TTS声调速查</div>
+  <table>
+    <tr><th>标记</th><th>含义</th><th>场景</th></tr>
+    <tr><td>1~4</td><td>一到四声</td><td>普通声调字</td></tr>
+    <tr><td>5</td><td>轻声</td><td>叠词第二字/语气助词/后缀子头等</td></tr>
+    <tr><td><strong>6</strong></td><td><strong>三三变调后的三声（必考！）</strong></td><td>雨yu6 / 你ni6 / 演yan6 / 讲jiang6</td></tr>
+  </table>
+</div>
+
+</div>
+<script>
+function sw(n){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
+  event.target.classList.add('active');
+}
+function tq(el){el.nextElementSibling.classList.toggle('show');}
+</script>
+</body>
+</html>
