@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>我的小屋</title>
+  <title>郭岩的小屋</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { overflow: hidden; font-family: 'Microsoft YaHei','PingFang SC',sans-serif; }
@@ -58,6 +58,50 @@
       font-size:12px; letter-spacing:3px; text-transform:uppercase;
       text-shadow: 0 1px 6px rgba(0,0,0,.4);
     }
+
+    /* ── 导航栏 ── */
+    #nav {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 0 16px;
+      opacity: 0;
+      animation: navIn 0.8s ease 2s forwards;
+    }
+    @keyframes navIn { from{opacity:0;transform:translateX(-50%) translateY(12px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      background: rgba(20,40,5,0.72);
+      border: 1px solid rgba(255,220,120,0.4);
+      border-radius: 28px;
+      color: rgba(255,230,170,0.9);
+      font-size: 13px;
+      text-decoration: none;
+      font-family: 'Microsoft YaHei','PingFang SC',sans-serif;
+      letter-spacing: 0.5px;
+      backdrop-filter: blur(10px);
+      transition: all 0.25s ease;
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .nav-btn:hover {
+      background: rgba(255,200,80,0.2);
+      border-color: rgba(255,220,120,0.8);
+      color: #FFE08A;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .nav-btn .ni { font-size: 15px; }
     #hint {
       position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
       z-index:20; pointer-events:none;
@@ -91,11 +135,20 @@
   <!-- App -->
   <div id="app">
     <div id="vignette"></div>
-    <div id="badge">My Room</div>
+    <div id="badge">郭岩的小屋</div>
     <div id="hint">悬停探索 · 点击进入</div>
     <div id="tip">
       <div class="tip-box" id="tip-text"></div>
       <div class="tip-arr"></div>
+    </div>
+
+    <!-- 导航栏 -->
+    <div id="nav">
+      <a class="nav-btn" href="about.html"><span class="ni">👤</span> 关于我</a>
+      <a class="nav-btn" href="photo.html"><span class="ni">📷</span> 我的相册</a>
+      <a class="nav-btn" href="video.html"><span class="ni">🎬</span> 我的视频</a>
+      <a class="nav-btn" href="notes.html"><span class="ni">📚</span> 学习笔记</a>
+      <a class="nav-btn" href="links.html"><span class="ni">🎨</span> 其他</a>
     </div>
   </div>
 

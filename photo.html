@@ -256,15 +256,15 @@ body {
 
   <div class="tabs-wrap">
     <span class="tabs-label">按地点浏览：</span>
-    <div class="tab active"  onclick="switchTab('sanya',this)">🌊 三亚</div>
+    <div class="tab active"  onclick="switchTab('ai',this)">🤖 AI 生成</div>
+    <div class="tab" onclick="switchTab('sanya',this)">🌊 三亚</div>
     <div class="tab" onclick="switchTab('jiuzhai',this)">🏔️ 九寨沟</div>
     <div class="tab" onclick="switchTab('hangzhou',this)">🌸 杭州西湖</div>
     <div class="tab" onclick="switchTab('chengdu',this)">🐼 成都</div>
-    <div class="tab" onclick="switchTab('ai',this)">🤖 AI 生成</div>
   </div>
 
   <!-- ══ 三亚 ══ -->
-  <div class="category active" id="cat-sanya">
+  <div class="category" id="cat-sanya">
     <div class="cat-block">
       <div class="cat-header"><span class="cat-icon">🌊</span><span class="cat-name">三亚旅行</span><span class="cat-badge">4 张照片</span></div>
       <p class="cat-desc">蓝色海岸线、棕榈树与礁石奇景，是属于三亚的热烈与松弛感。</p>
@@ -384,7 +384,7 @@ body {
   </div>
 
   <!-- ══ AI 生成 ══ -->
-  <div class="category" id="cat-ai">
+  <div class="category active" id="cat-ai">
     <div class="cat-block">
       <div class="cat-header"><span class="cat-icon">🤖</span><span class="cat-name">AI 生成照片</span><span class="cat-badge">4 张</span></div>
       <p class="cat-desc">用提示词召唤出的画面灵感，每一张都附有生成时使用的完整提示词。</p>
